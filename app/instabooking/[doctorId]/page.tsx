@@ -1,354 +1,431 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, getDoc, collection, query, where, getDocs, addDoc, Timestamp, setDoc } from 'firebase/firestore';
-import { db, auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
+import { doc, getDoc, collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAuthStore } from '@/lib/store';
+import Navbar from '@/components/Navbar';
+import PatientBottomNav from '@/components/PatientBottomNav';
 import { 
-  User, MapPin, Award, Clock, DollarSign, Calendar, 
-  Phone, Mail, AlertCircle, CheckCircle, Stethoscope, Star,
-  Zap, ArrowRight, ShieldCheck, Sparkles, Activity, ChevronRight,
-  MessageSquare, Briefcase, GraduationCap
+  MapPin, Star, Award, DollarSign, Clock, Calendar, 
+  Stethoscope, Phone, Mail, CheckCircle, Users, AlertCircle
 } from 'lucide-react';
-import { useAlertStore } from '@/lib/alert-store';
-import SuccessPulse from '@/components/SuccessPulse';
 
-export default function InstaBooking() {
+export default function DoctorProfile() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
   const doctorId = params.doctorId as string;
-  const { showAlert } = useAlertStore();
 
+  const [doctor, setDoctor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  
-  // Doctor data
-  const [doctorData, setDoctorData] = useState<any>(null);
+  const [booking, setBooking] = useState(false);
+  const [liveQueue, setLiveQueue] = useState(0);
   const [isAvailableToday, setIsAvailableToday] = useState(false);
+  const [todayDay, setTodayDay] = useState('');
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    phone: '',
-    symptoms: '',
-    conditions: ''
-  });
-  
-  // Enforced Cash Only for InstaSync
-  const paymentMethod = 'cash_on_counter';
+  // Booking form
+  const [symptoms, setSymptoms] = useState('');
+  const [existingConditions, setExistingConditions] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash_on_counter');
 
   useEffect(() => {
-    if (!doctorId) return;
-    
-    const fetchData = async () => {
-      try {
-        const docSnap = await getDoc(doc(db, 'doctors', doctorId));
-        if (docSnap.exists()) {
-          const doctor = { uid: doctorId, ...docSnap.data() };
-          setDoctorData(doctor);
-          
-          const today = new Date();
-          const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
-          setIsAvailableToday(isDoctorAvailable(doctor, dayName));
-        }
-      } catch (error) {
-        console.error('Fetch error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchDoctorData();
+    checkAvailability();
   }, [doctorId]);
 
-  const isDoctorAvailable = (doctor: any, dayName: string) => {
-    if (doctor.workingDays) return doctor.workingDays.includes(dayName);
-    const dayMap: any = { 'Monday': doctor.monday, 'Tuesday': doctor.tuesday, 'Wednesday': doctor.wednesday, 'Thursday': doctor.thursday, 'Friday': doctor.friday, 'Saturday': doctor.saturday, 'Sunday': doctor.sunday };
+  const checkAvailability = () => {
+    const today = new Date();
+    const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+    setTodayDay(dayName);
+  };
+
+  const isDoctorAvailable = (doctor: any) => {
+    if (!doctor) return false;
+    
+    const today = new Date();
+    const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    // Check if doctor has workingDays array
+    if (doctor.workingDays && Array.isArray(doctor.workingDays)) {
+      return doctor.workingDays.includes(dayName);
+    }
+    
+    // Check individual day flags
+    const dayMap: any = {
+      'Monday': doctor.monday,
+      'Tuesday': doctor.tuesday,
+      'Wednesday': doctor.wednesday,
+      'Thursday': doctor.thursday,
+      'Friday': doctor.friday,
+      'Saturday': doctor.saturday,
+      'Sunday': doctor.sunday,
+    };
+    
     return dayMap[dayName] === true;
   };
 
-  const handleBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.symptoms) return;
+  useEffect(() => {
+    fetchDoctorData();
+  }, [doctorId]);
 
-    setSubmitting(true);
+  const fetchDoctorData = async () => {
     try {
-      let userId = auth.currentUser?.uid;
-      
-      // Auto-Create Patient Record
-      if (!userId) {
-        // Check if user with this phone exists
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('phone', '==', formData.phone));
-        const querySnapshot = await getDocs(q);
+      const docSnap = await getDoc(doc(db, 'doctors', doctorId));
+      if (docSnap.exists()) {
+        const doctorData = { id: doctorId, ...docSnap.data() };
+        setDoctor(doctorData);
         
-        if (!querySnapshot.empty) {
-          userId = querySnapshot.docs[0].id;
-        } else {
-          // Create new patient record
-          const anonCred = await signInAnonymously(auth);
-          userId = anonCred.user.uid;
-          await setDoc(doc(db, 'users', userId), {
-            uid: userId,
-            name: formData.name,
-            phone: formData.phone,
-            role: 'patient',
-            isGhostAccount: true,
-            createdAt: Timestamp.now()
-          });
-        }
+        // Check if doctor is available today
+        const available = isDoctorAvailable(doctorData);
+        setIsAvailableToday(available);
+        
+        // Fetch today's queue
+        const today = new Date().toISOString().split('T')[0];
+        const bookingsQuery = query(
+          collection(db, 'bookings'),
+          where('doctorId', '==', doctorId),
+          where('appointmentDateStr', '==', today)
+        );
+        const bookingsSnap = await getDocs(bookingsQuery);
+        const queueCount = bookingsSnap.docs.filter(
+          doc => doc.data().status === 'confirmed' || doc.data().status === 'pending'
+        ).length;
+        setLiveQueue(queueCount);
       }
-
-      const fee = doctorData?.fees || doctorData?.consultationFee || 699;
-      const total = fee + 25;
-      const today = new Date();
-
-      await addDoc(collection(db, 'bookings'), {
-        doctorId: doctorData.uid,
-        doctorName: doctorData.name,
-        doctorSpecialty: doctorData.specialization || 'General',
-        userId: userId,
-        patientName: formData.name,
-        patientAge: parseInt(formData.age),
-        patientPhone: formData.phone,
-        symptoms: formData.symptoms,
-        existingConditions: formData.conditions,
-        appointmentDate: Timestamp.fromDate(today),
-        appointmentDateStr: today.toISOString().split('T')[0],
-        queueNumber: 1, // Placeholder for instant sync
-        paymentMethod,
-        totalAmount: total,
-        status: 'pending',
-        isInstant: true,
-        createdAt: Timestamp.now()
-      });
-
-      setShowSuccess(true);
     } catch (error) {
-      console.error('Booking error:', error);
-      showAlert('Sync Failed', 'We could not synchronize your booking at this moment. Please check your network and try again.', 'error');
+      console.error('Error fetching doctor:', error);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#080C10] flex items-center justify-center">
-       <div className="w-12 h-12 border-4 border-primary border-t-transparent animate-spin rounded-full" />
-    </div>
-  );
+  const handleBooking = async () => {
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    // Check if doctor is available today
+    if (!isAvailableToday) {
+      alert(`Dr. ${doctor.name} is not available on ${todayDay}. Please check working days and try another day.`);
+      return;
+    }
+
+    if (!symptoms.trim()) {
+      alert('Please describe your symptoms');
+      return;
+    }
+
+    setBooking(true);
+    try {
+      const today = new Date();
+      const consultationFee = doctor.fees || doctor.consultationFee || 699;
+      const extraCharge = 25;
+      const totalAmount = consultationFee + extraCharge;
+
+      // Get user data
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const userData = userDoc.data();
+
+      await addDoc(collection(db, 'bookings'), {
+        doctorId: doctor.id,
+        doctorName: doctor.name,
+        doctorSpecialty: doctor.specialization || doctor.specialty || 'General',
+        userId: user.uid,
+        userName: userData?.name || user.email,
+        userPhone: userData?.phone || '',
+        patientName: userData?.name || user.email?.split('@')[0],
+        patientAge: userData?.age || 25,
+        symptoms: symptoms.trim(),
+        existingConditions: existingConditions.trim(),
+        appointmentDate: Timestamp.fromDate(today),
+        appointmentDateStr: today.toISOString().split('T')[0],
+        appointmentDay: today.toLocaleDateString('en-US', { weekday: 'long' }),
+        queueNumber: liveQueue + 1,
+        paymentMethod: paymentMethod,
+        consultationFee: consultationFee,
+        extraCharge: extraCharge,
+        totalAmount: totalAmount,
+        paymentStatus: 'pending',
+        status: 'pending',
+        createdAt: Timestamp.now(),
+      });
+
+      alert('Appointment booked successfully!');
+      router.push('/patient/appointments');
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      alert('Failed to book appointment');
+    } finally {
+      setBooking(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!doctor) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="glass rounded-2xl p-8 text-center">
+          <AlertCircle className="mx-auto mb-4 text-red-400" size={64} />
+          <h2 className="text-2xl font-bold mb-2">Doctor Not Found</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#080C10] text-white selection:bg-primary/30 pb-20 overflow-x-hidden">
-      
-      {/* ── BACKGROUND MESH ── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-violet/5 rounded-full blur-[100px]" />
-      </div>
-
-      <div className="relative z-10 max-w-xl mx-auto px-6 py-12">
-        
-        {/* ── HEADER ── */}
-        <div className="flex items-center justify-between mb-12 animate-fade-in">
-           <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-[#080C10] shadow-[0_0_20px_rgba(0,229,160,0.3)]">
-                 <Zap size={22} strokeWidth={3} />
-              </div>
-              <h1 className="text-[18px] font-black tracking-tighter uppercase italic">InstaSync</h1>
-           </div>
-           <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-primary/60">
-              Clinical Directory Mode
-           </div>
-        </div>
-
-        {/* ── DOCTOR PROFILE CARD ── */}
-        <div className="relative group mb-10 animate-fade-in-up">
-           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-violet/20 blur opacity-30 transition duration-500 rounded-[32px]" />
-           <div className="relative bg-[#0E1419] border border-white/[0.08] rounded-[32px] p-8">
-              <div className="flex items-center gap-6 mb-8 border-b border-white/[0.05] pb-8">
-                 <div className="relative">
-                    <div className="w-24 h-24 rounded-[32px] overflow-hidden border-2 border-primary/20 bg-white/5">
-                       {doctorData.profilePic ? (
-                         <img src={doctorData.profilePic} className="w-full h-full object-cover" />
-                       ) : (
-                         <div className="w-full h-full flex items-center justify-center text-4xl font-black text-white/10">{doctorData.name[0]}</div>
-                       )}
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-primary text-[#080C10] flex items-center justify-center shadow-lg">
-                       <ShieldCheck size={18} strokeWidth={3} />
-                    </div>
-                 </div>
-                 <div>
-                    <h2 className="text-[28px] font-black leading-tight">Dr. {doctorData.name}</h2>
-                    <p className="text-[14px] font-bold text-primary uppercase tracking-widest mt-1 italic">{doctorData.specialization || 'Clinical Expert'}</p>
-                    <div className="flex items-center gap-2 mt-3">
-                       <div className="flex gap-1 text-amber">
-                          {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
-                       </div>
-                       <span className="text-[12px] font-bold text-white/30 truncate">Verified Specialist</span>
-                    </div>
-                 </div>
-              </div>
-
-              {/* PROFESSIONAL BIO (The "About" request) */}
-              <div className="space-y-4 mb-8">
-                 <div className="flex items-center gap-2">
-                    <MessageSquare size={16} className="text-violet" />
-                    <span className="text-[11px] font-black uppercase text-white/30 tracking-widest">Executive Summary</span>
-                 </div>
-                 <p className="text-[14px] text-white/60 leading-relaxed italic">
-                    &quot;{doctorData.about || `Dr. ${doctorData.name} is a dedicated health professional specializing in ${doctorData.specialization || 'General Medicine'} with over ${doctorData.experience || '10'} years of clinical excellence.`}&quot;
-                 </p>
-              </div>
-
-              {/* PROFESSIONAL DETAILS (The "Details" request) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-start gap-3">
-                    <GraduationCap size={18} className="text-primary mt-1" />
-                    <div>
-                       <p className="text-[10px] font-black text-white/20 uppercase">Degree</p>
-                       <p className="text-[13px] font-bold text-white">{doctorData.degree || 'MBBS, MD'}</p>
-                    </div>
-                 </div>
-                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-start gap-3">
-                    <MapPin size={18} className="text-violet mt-1" />
-                    <div>
-                       <p className="text-[10px] font-black text-white/20 uppercase">Practice</p>
-                       <p className="text-[13px] font-bold text-white truncate max-w-[120px]">{doctorData.clinicName || 'City Medical'}</p>
-                    </div>
-                 </div>
-              </div>
-
-              {!isAvailableToday && (
-                <div className="p-4 bg-rose/10 border border-rose/20 rounded-2xl flex items-center gap-3 text-rose mb-6">
-                   <AlertCircle size={20} />
-                   <p className="text-[12px] font-bold italic">Schedule not active today. Booking for tomorrow.</p>
+    <>
+      <div className="min-h-screen pb-20 lg:pb-0">
+        <Navbar />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Doctor Profile Card */}
+          <div className="glass rounded-2xl p-6 md:p-8 mb-6">
+            <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
+              {doctor.profilePic ? (
+                <img 
+                  src={doctor.profilePic} 
+                  alt={doctor.name}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-primary"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center border-4 border-primary">
+                  <span className="text-4xl font-bold text-primary">
+                    {doctor.name?.charAt(0) || 'D'}
+                  </span>
                 </div>
               )}
-           </div>
+              <div className="text-center md:text-left flex-1">
+                <h1 className="text-3xl font-bold mb-2">Dr. {doctor.name}</h1>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-3">
+                  <span className="px-3 py-1 bg-primary/20 text-primary rounded-lg text-sm font-medium flex items-center gap-1">
+                    <Stethoscope size={14} />
+                    {doctor.specialization || doctor.specialty || 'General Physician'}
+                  </span>
+                  <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm font-medium flex items-center gap-1">
+                    <CheckCircle size={14} />
+                    Verified
+                  </span>
+                </div>
+                  {doctor.about && (
+                    <div className="mt-2 text-center md:text-left">
+                      <p className="text-slate-600 text-sm line-clamp-3">{doctor.about}</p>
+                    </div>
+                  )}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="p-4 bg-white rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="text-primary" size={20} />
+                  <span className="text-sm text-slate-500">Experience</span>
+                </div>
+                <p className="text-xl font-bold">{doctor.experience || 5}+ Years</p>
+              </div>
+
+              <div className="p-4 bg-white rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="text-primary" size={20} />
+                  <span className="text-sm text-slate-500">Consultation Fee</span>
+                </div>
+                <p className="text-xl font-bold text-primary">₹{doctor.fees || doctor.consultationFee || 699}</p>
+              </div>
+
+              <div className="p-4 bg-white rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="text-primary" size={20} />
+                  <span className="text-sm text-slate-500">Live Queue</span>
+                </div>
+                <p className="text-xl font-bold text-yellow-400">{liveQueue} Patients</p>
+              </div>
+            </div>
+
+            {/* Availability Status */}
+            <div className={`p-4 rounded-xl border-2 mb-6 ${
+              isAvailableToday 
+                ? 'bg-green-500/10 border-green-500/50' 
+                : 'bg-red-500/10 border-red-500/50'
+            }`}>
+              <div className="flex items-center gap-3">
+                <Clock className={isAvailableToday ? 'text-green-400' : 'text-red-400'} size={24} />
+                <div className="flex-1">
+                  <p className={`font-bold ${isAvailableToday ? 'text-green-400' : 'text-red-400'}`}>
+                    {isAvailableToday ? `✓ Available Today (${todayDay})` : `✗ Not Available Today (${todayDay})`}
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {isAvailableToday 
+                      ? 'You can book an appointment for today' 
+                      : 'Doctor is not available on this day. Check working days below.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Working Days */}
+            {(doctor.workingDays || doctor.monday !== undefined) && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Working Days</h3>
+                <div className="grid grid-cols-7 gap-2">
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                    const isWorking = doctor.workingDays 
+                      ? doctor.workingDays.includes(day)
+                      : doctor[day.toLowerCase()] === true;
+                    const isToday = day === todayDay;
+                    
+                    return (
+                      <div 
+                        key={day}
+                        className={`p-3 rounded-xl text-center text-sm ${
+                          isWorking 
+                            ? isToday 
+                              ? 'bg-primary text-white font-bold' 
+                              : 'bg-green-500/20 text-green-400'
+                            : 'bg-red-500/10 text-red-400'
+                        }`}
+                      >
+                        <p className="font-medium">{day.slice(0, 3)}</p>
+                        <p className="text-xs mt-1">{isWorking ? '✓' : '✗'}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Timings */}
+            {(doctor.startTime || doctor.endTime) && (
+              <div className="flex items-center gap-3 p-4 bg-white rounded-xl mb-6">
+                <Clock className="text-primary" size={20} />
+                <div>
+                  <p className="font-semibold">Consultation Hours</p>
+                  <p className="text-sm text-slate-500">
+                    {doctor.startTime || '9:00 AM'} - {doctor.endTime || '5:00 PM'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+
+
+            {doctor.degree && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">Qualifications</h3>
+                <p className="text-slate-600 text-sm">{doctor.degree}</p>
+                {doctor.university && (
+                  <p className="text-slate-500 text-xs mt-1">{doctor.university}</p>
+                )}
+              </div>
+            )}
+
+            {doctor.clinicAddress && (
+              <div className="flex items-start gap-3 p-4 bg-white rounded-xl">
+                <MapPin className="text-primary flex-shrink-0 mt-1" size={20} />
+                <div>
+                  <p className="font-semibold mb-1">{doctor.clinicName || 'Clinic'}</p>
+                  <p className="text-sm text-slate-500">{doctor.clinicAddress}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Booking Form */}
+          <div className="glass rounded-2xl p-6 md:p-8">
+            <h2 className="text-2xl font-bold mb-6">Book Appointment</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Symptoms / Reason for Visit *</label>
+                <textarea
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition min-h-[100px]"
+                  placeholder="Describe your symptoms..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Existing Conditions (Optional)</label>
+                <textarea
+                  value={existingConditions}
+                  onChange={(e) => setExistingConditions(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition min-h-[80px]"
+                  placeholder="Any allergies, chronic conditions, current medications..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-3">Payment Method</label>
+                <div className="space-y-3">
+                  {[
+                    { key: 'cash_on_counter', label: 'Pay at Counter', icon: '💵' },
+                    { key: 'upi', label: 'UPI Payment', icon: '📱' },
+                    { key: 'card', label: 'Card Payment', icon: '💳' },
+                  ].map((method) => (
+                    <button
+                      key={method.key}
+                      onClick={() => setPaymentMethod(method.key)}
+                      className={`w-full p-4 rounded-xl border-2 transition text-left ${
+                        paymentMethod === method.key
+                          ? 'border-primary bg-primary/20'
+                          : 'border-slate-200 bg-white hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-2xl">{method.icon}</span>
+                        <span className="font-medium">{method.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fee Breakdown */}
+              <div className="p-4 bg-white rounded-xl">
+                <div className="flex justify-between mb-2">
+                  <span className="text-slate-500">Consultation Fee</span>
+                  <span className="font-semibold">₹{doctor.fees || doctor.consultationFee || 699}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-slate-500">Platform Fee</span>
+                  <span className="font-semibold">₹25</span>
+                </div>
+                <div className="border-t border-slate-200 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="font-bold">Total Amount</span>
+                    <span className="font-bold text-primary text-xl">
+                      ₹{(doctor.fees || doctor.consultationFee || 699) + 25}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleBooking}
+                disabled={booking || !isAvailableToday}
+                className="w-full bg-primary text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {booking ? 'Booking...' : !isAvailableToday ? `Not Available on ${todayDay}` : 'Confirm Booking'}
+              </button>
+              
+              {!isAvailableToday && (
+                <p className="text-center text-sm text-red-400 mt-2">
+                  Doctor is not available today. Please check working days above.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
-
-        {/* ── BOOKING FORM ── */}
-        <form onSubmit={handleBooking} className="space-y-6 animate-fade-in-up delay-150">
-           <div className="space-y-4">
-              <h3 className="text-[18px] font-black uppercase tracking-widest text-white/30 px-2 flex items-center gap-2">
-                 <User size={16} /> Patient Dossier
-              </h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase text-white/40 ml-2">Full Identity</label>
-                    <input 
-                      required
-                      type="text" 
-                      placeholder="e.g. Rahul Sharma"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                    />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase text-white/40 ml-2">Age</label>
-                    <input 
-                      required
-                      type="number" 
-                      placeholder="24"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.age}
-                      onChange={e => setFormData({...formData, age: e.target.value})}
-                    />
-                 </div>
-              </div>
-
-              <div className="space-y-2">
-                 <label className="text-[11px] font-black uppercase text-white/40 ml-2">Protected Phone Number</label>
-                 <div className="relative">
-                    <Phone size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20" />
-                    <input 
-                      required
-                      type="tel" 
-                      placeholder="+91 00000 00000"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.phone}
-                      onChange={e => setFormData({...formData, phone: e.target.value})}
-                    />
-                 </div>
-              </div>
-
-              <div className="space-y-2">
-                 <label className="text-[11px] font-black uppercase text-white/40 ml-2">Clinical Symptoms</label>
-                 <textarea 
-                   required
-                   placeholder="Describe how you feel..."
-                   className="w-full min-h-[100px] py-4 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                   value={formData.symptoms}
-                   onChange={e => setFormData({...formData, symptoms: e.target.value})}
-                 />
-              </div>
-           </div>
-
-           <div className="space-y-4 pt-4">
-              <h3 className="text-[18px] font-black uppercase tracking-widest text-white/30 px-2 flex items-center gap-2">
-                 <Activity size={16} /> Transaction Protocol
-              </h3>
-              
-              {/* Only Cash shown here - Static Badge */}
-              <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center gap-3 text-primary">
-                 <DollarSign size={20} />
-                 <span className="text-[13px] font-black uppercase tracking-[2px]">CASH AT CLINIC COUNTER</span>
-                 <CheckCircle size={16} className="ml-auto" />
-              </div>
-
-              <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/5">
-                 <div className="flex justify-between items-center mb-2">
-                    <span className="text-[12px] text-white/30 font-bold uppercase tracking-widest">Clinical Fee</span>
-                    <span className="text-[14px] font-black">₹{doctorData.fees || 699}</span>
-                 </div>
-                 <div className="flex justify-between items-center mb-4">
-                    <span className="text-[12px] text-white/30 font-bold uppercase tracking-widest">Platform Service</span>
-                    <span className="text-[14px] font-black">₹25</span>
-                 </div>
-                 <div className="border-t border-white/5 pt-4 flex justify-between items-center">
-                    <span className="text-[14px] font-black uppercase text-primary tracking-widest">Final Pulse</span>
-                    <span className="text-[24px] font-black tracking-tight">₹{(doctorData.fees || 699) + 25}</span>
-                 </div>
-              </div>
-           </div>
-
-           <button
-             type="submit"
-             disabled={submitting}
-             className="w-full relative group h-16 rounded-[40px] bg-primary flex items-center justify-center text-[#080C10] shadow-[0_20px_50px_rgba(0,229,160,0.2)] overflow-hidden transition-all active:scale-95 disabled:opacity-50"
-           >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <div className="relative flex items-center gap-3 text-[16px] font-black uppercase tracking-[3px]">
-                 {submitting ? (
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent animate-spin rounded-full" />
-                 ) : (
-                    <>Sync Appointment <ArrowRight size={20} strokeWidth={3} /></>
-                 )}
-              </div>
-           </button>
-        </form>
-
-        <p className="text-center text-[10px] text-white/20 uppercase tracking-[4px] mt-12">
-           Encrypted End-to-End • Health lol
-        </p>
       </div>
-
-      <SuccessPulse 
-        isOpen={showSuccess} 
-        onClose={() => router.push('/patient/home')} 
-        message="Booking Synced!" 
-        subMessage="Redirecting to Portal..."
-      />
-
-      <style>{`
-        .shadow-glow { box-shadow: 0 0 80px rgba(0,229,160,0.1); }
-      `}</style>
-    </div>
+      <PatientBottomNav />
+    </>
   );
 }
