@@ -1,0 +1,14 @@
+# Allow all search engines
+User-agent: *
+Allow: /
+
+# Disallow admin and private pages
+    
+
+# Allow public pages
+Allow: /
+Allow: /auth/
+Allow: /instabooking/
+
+# Sitemap
+Sitemap: https://ananthealth.vercel.app/sitemap.xml
