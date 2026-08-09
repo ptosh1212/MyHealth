@@ -1,70 +1,85 @@
-# My Health - Web Platform
+# My Health
 
-A modern healthcare platform connecting patients and doctors with real-time notifications.
+![Hackatime Stats](https://github-readme-stats.hackclub.dev/api/wakatime?username=55530\&api_domain=hackatime.hackclub.com\&theme=darcula\&custom_title=Hackatime+Stats\&layout=compact\&cache_seconds=0\&langs_count=8)
+
+This is a health website which I made for patients and doctors as i suffer frm Seizure Attacks. The main idea is to make it easier for patients to find doctors, book appointments and manage their medicines.
+
+This project is still not fully complete and some things may not work properly.
 
 ## Features
 
 ### For Patients
-- 🔍 Search and find doctors by specialty
-- 📅 Book appointments online
-- 💊 Track medicines and prescriptions
-- 📋 View medical records
-- 🔔 Real-time notifications for appointments
-- 💬 Video consultations (coming soon)
+
+* Search doctors by their specialty
+* Book appointments
+* Track medicines and prescriptions
+* View medical records
+* Get appointment notifications
+* Chat with doctors after appointment is approved
 
 ### For Doctors
-- 📊 Dashboard with analytics
-- 👥 Patient management
-- 📅 Appointment scheduling
-- 💰 Earnings tracking
-- 📝 Create prescriptions
-- 🔔 Appointment notifications
 
-## Tech Stack
+* Doctor dashboard
+* Manage patients
+* Manage appointments
+* Track earnings
+* Make prescriptions
+* Appointment notifications
+* Chat with patients
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Firebase (Auth, Firestore, Storage, Cloud Messaging)
-- **State Management**: Zustand
-- **Icons**: Lucide React
-- **Real-time**: Socket.io (optional)
-- **Video**: SimplePeer (optional)
+## Tech Stack Lol
+
+* **Framework:** Next.js 14 (App Router)
+* **Language:** TypeScript
+* **Styling:** Tailwind CSS
+* **Backend:** Firebase
+* **Authentication:** Firebase Auth
+* **Database:** Firestore
+* **Storage:** Firebase Storage
+* **Notifications:** Firebase Cloud Messaging
+* **State Management:** Zustand
+* **Icons:** Lucide React
 
 ## Getting Started
 
-### Prerequisites
+### Requirements
 
-- Node.js 18+ installed
-- Firebase project set up
-- VAPID key for push notifications
+You need:
+
+* Node.js 18 or higher
+* Firebase project
+* VAPID key for push notifications
 
 ### Installation
 
-1. Install dependencies:
+First install the dependencies:
+
 ```bash
-cd web-platform
-npm install
+npm i
 ```
 
-2. Configure Firebase:
-   - Update `.env.local` with your Firebase credentials
-   - Get VAPID key from Firebase Console > Project Settings > Cloud Messaging
+Then create a `.env.local` file and add your Firebase details.
 
-3. Run development server:
+After that run:
+
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000)
+Then open:
+
+```text
+http://localhost:3000
+```
 
 ## Firebase Setup
 
-### 1. Create Collections
+### 1. Users Collection
 
-Create these collections in Firestore:
+Create a `users` collection in Firestore.
 
-**users**
+Example:
+
 ```json
 {
   "name": "string",
@@ -77,85 +92,67 @@ Create these collections in Firestore:
 }
 ```
 
-**appointments**
-```json
-{
-    "patientId": "string",
-    "patientName": "string",
-    "doctorId": "string",
-    "doctorName": "string",
-    "specialty": "string",
-    "date": "string (YYYY-MM-DD)",
-    "time": "string (HH:MM)",
-    "status": "pending | confirmed | completed | cancelled",
-    "reason": "string",
-    "createdAt": "timestamp"
-  }
-```
+### 2. Authentication
 
-### 2. Enable Authentication
-- Go to Firebase Console > Authentication
-- Enable Email/Password sign-in method
+Go to:
 
-### 3. Enable Cloud Messaging
-- Go to Firebase Console > Cloud Messaging
-- Generate VAPID key
-- Add to `.env.local`
+Firebase Console > Authentication > Sign-in method
 
-### 4. Firestore Rules (Development)
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
+Enable Email/Password login.
+
+### 3. Cloud Messaging
+
+Go to:
+
+Firebase Console > Project Settings > Cloud Messaging
+
+Get the VAPID key and add it to `.env.local`.
 
 ## Push Notifications
 
-The app supports web push notifications for:
-- Appointment confirmations
-- Appointment reminders
-- Medicine reminders
-- New messages
+The website has push notifications for:
 
-Users will be prompted to allow notifications on first login.
+* Appointment confirmation
+* Appointment reminders
+* Medicine reminders
+* New messages
+
+The user will be asked for notification permission when required.
 
 ## Project Structure
 
-```
-web-platform/
+```text
+my-health/
 ├── app/
 │   ├── auth/          # Authentication pages
-│   ├── patient/       # Patient dashboard & features
-│   ├── doctor/        # Doctor dashboard & features
-│   ├── layout.tsx     # Root layout
-│   ├── page.tsx       # Home/redirect page
-│   └── globals.css    # Global styles
+│   ├── patient/       # Patient pages
+│   ├── doctor/        # Doctor pages
+│   ├── layout.tsx     # Main layout
+│   ├── page.tsx       # Home / redirect
+│   └── globals.css    # Global CSS
+│
 ├── components/        # Reusable components
-├── lib/              # Utilities & configs
-│   ├── firebase.ts   # Firebase config
-│   ├── store.ts      # Zustand store
-│   └── notifications.ts # Push notifications
-├── public/           # Static assets
+│
+├── lib/
+│   ├── firebase.ts    # Firebase config
+│   ├── store.ts       # Zustand store
+│   └── notifications.ts
+│
+├── public/            # Static files
 └── package.json
 ```
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel Recommended Byy MEe
 
-1. Push code to GitHub
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy
+1. Push the code to GitHub
+2. Import the project in Vercel
+3. Add all the environment variables
+4. Deploy it
 
-### Other Platforms
+For production you can also run:
 
-Build for production:
 ```bash
 npm run build
 npm start
@@ -163,7 +160,7 @@ npm start
 
 ## Environment Variables
 
-Required in `.env.local`:
+Add these in `.env.local`:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=
@@ -176,22 +173,26 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
 NEXT_PUBLIC_VAPID_KEY=
 ```
 
-## Features to Add
+## Important
 
-- [ ] Video consultations
-- [ ] Payment integration
-- [ ] Medicine ordering
-- [ ] Chat system
-- [ ] Prescription OCR
-- [ ] Multi-language support
-- [ ] Dark/Light theme toggle
-- [ ] Email notifications
-- [ ] SMS notifications
+This project is still in development, so there can be bugs and some features may not work.
 
-## License
+The doctors shown in the doctor list are not real doctors. They are only test accounts made for testing the website.
 
-Private - All rights reserved
+If you want to test both doctor and patient accounts at the same time, I recommend using two browsers.
 
-## Support
+For example:
 
-For issues or questions, contact: support@anant.health
+**Microsoft Edge:** Doctor account
+
+**Google Chrome:** Patient account
+
+This makes testing both roles easier.
+
+---
+
+I made this project for Hack Club and I am still working on improving it.
+
+Thanks for checking my project.
+
+**Anant**
