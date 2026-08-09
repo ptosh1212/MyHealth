@@ -11,14 +11,13 @@
     "noEmit": true,
     "incremental": true,
 
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
 
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -32,8 +31,9 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "postcss.config.js"  ],
+    "**/*.tsx",
+    "postcss.config.js"
+  ],
   "exclude": [
     "node_modules"
   ]
