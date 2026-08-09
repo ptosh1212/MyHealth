@@ -23,7 +23,7 @@ export default function QRBooking() {
   const [qrSize, setQrSize] = useState(300);
   const [includeText, setIncludeText] = useState(true);
 
-  const bookingUrl = `https://ananthealth.com/instabooking/${user?.uid}`;
+  const bookingUrl = `https://my-health-fawn.vercel.app/instabooking/${user?.uid}`;
 
   useEffect(() => {
     if (!user?.uid) return;

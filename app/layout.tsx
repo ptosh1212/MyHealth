@@ -40,14 +40,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://ananthealth.com'),
+  metadataBase: new URL('https://my-health-fawn.vercel.app/'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: "My Health - Book Doctors Online | Skip the Line",
     description: "Book doctor appointments instantly. Get ambulance in 10 minutes, medicines delivered fast. Smart queue system, digital prescriptions.",
-    url: 'https://ananthealth.com',
+    url: 'https://my-health-fawn.vercel.app/',
     siteName: 'My Health',
     images: [
       {
@@ -134,9 +134,9 @@ export default function RootLayout({
               "@type": "MedicalBusiness",
               "name": "My Health",
               "description": "Online healthcare platform for booking doctors, ambulance services, and medicine delivery",
-              "url": "https://ananthealth.com",
-              "logo": "https://ananthealth.com/logo.svg",
-              "image": "https://ananthealth.com/og-image.png",
+              "url": "https://my-health-fawn.vercel.app/",
+              "logo": "https://my-health-fawn.vercel.app/logo.svg",
+              "image": "https://my-health-fawn.vercel.app/og-image.png",
               "priceRange": "₹₹",
               "address": {
                 "@type": "PostalAddress",
@@ -154,7 +154,7 @@ export default function RootLayout({
               ],
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://ananthealth.com/patient/search?q={search_term_string}",
+                "target": "https://my-health-fawn.vercel.app/patient/search?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             })

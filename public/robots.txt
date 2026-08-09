@@ -11,4 +11,4 @@ Allow: /auth/
 Allow: /instabooking/
 
 # Sitemap
-Sitemap: https://ananthealth.vercel.app/sitemap.xml
+Sitemap: https://my-health-fawn.vercel.app/sitemap.xml
