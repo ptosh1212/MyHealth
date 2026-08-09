@@ -162,7 +162,7 @@ export default function LandingPage() {
           <div className="hero__copy">
             <div className="eyebrow">MY HEALTH</div>
             <h1 className="hero__headline">
-              Coonect With DOctors & Patients.
+              Connect With DOctors & Patients.
             </h1>
             <p className="hero__sub">
               My Health is a project that is used for conversation btween doctors n patients
