@@ -15,7 +15,7 @@ export default function TermsPage() {
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-[#1D9E75] rounded-lg flex items-center justify-center text-white font-bold">Z</div>
-            <span className="font-bold text-lg tracking-tight">Anant <span className="text-[#1D9E75]">Health</span></span>
+            <span className="font-bold text-lg tracking-tight">My <span className="text-[#1D9E75]">Health</span></span>
           </Link>
           <Link href="/" className="text-sm font-semibold text-gray-400 hover:text-[#1D9E75] transition-colors">
             Back

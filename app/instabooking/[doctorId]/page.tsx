@@ -1,15 +1,13 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, query, where, getDocs, addDoc, Timestamp, setDoc } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
-import { 
-  User, MapPin, Award, Clock, DollarSign, Calendar, 
-  Phone, Mail, AlertCircle, CheckCircle, Stethoscope, Star,
-  Zap, ArrowRight, ShieldCheck, Sparkles, Activity, ChevronRight,
-  MessageSquare, Briefcase, GraduationCap
+import { signInAnonymously } from 'firebase/auth';
+import {
+  User, MapPin, Phone, AlertCircle, CheckCircle, Star,
+  ArrowRight, Activity, MessageSquare, GraduationCap
 } from 'lucide-react';
 import { useAlertStore } from '@/lib/alert-store';
 import SuccessPulse from '@/components/SuccessPulse';
@@ -23,12 +21,10 @@ export default function InstaBooking() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  // Doctor data
+
   const [doctorData, setDoctorData] = useState<any>(null);
   const [isAvailableToday, setIsAvailableToday] = useState(false);
 
-  // Form state
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -36,20 +32,19 @@ export default function InstaBooking() {
     symptoms: '',
     conditions: ''
   });
-  
-  // Enforced Cash Only for InstaSync
+
   const paymentMethod = 'cash_on_counter';
 
   useEffect(() => {
     if (!doctorId) return;
-    
+
     const fetchData = async () => {
       try {
         const docSnap = await getDoc(doc(db, 'doctors', doctorId));
         if (docSnap.exists()) {
           const doctor = { uid: doctorId, ...docSnap.data() };
           setDoctorData(doctor);
-          
+
           const today = new Date();
           const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
           setIsAvailableToday(isDoctorAvailable(doctor, dayName));
@@ -76,18 +71,15 @@ export default function InstaBooking() {
     setSubmitting(true);
     try {
       let userId = auth.currentUser?.uid;
-      
-      // Auto-Create Patient Record
+
       if (!userId) {
-        // Check if user with this phone exists
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('phone', '==', formData.phone));
         const querySnapshot = await getDocs(q);
-        
+
         if (!querySnapshot.empty) {
           userId = querySnapshot.docs[0].id;
         } else {
-          // Create new patient record
           const anonCred = await signInAnonymously(auth);
           userId = anonCred.user.uid;
           await setDoc(doc(db, 'users', userId), {
@@ -117,7 +109,7 @@ export default function InstaBooking() {
         existingConditions: formData.conditions,
         appointmentDate: Timestamp.fromDate(today),
         appointmentDateStr: today.toISOString().split('T')[0],
-        queueNumber: 1, // Placeholder for instant sync
+        queueNumber: 1,
         paymentMethod,
         totalAmount: total,
         status: 'pending',
@@ -128,227 +120,200 @@ export default function InstaBooking() {
       setShowSuccess(true);
     } catch (error) {
       console.error('Booking error:', error);
-      showAlert('Sync Failed', 'We could not synchronize your booking at this moment. Please check your network and try again.', 'error');
+      showAlert('Booking failed', 'We could not save your booking right now. Please check your connection and try again.', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080C10] flex items-center justify-center">
-       <div className="w-12 h-12 border-4 border-primary border-t-transparent animate-spin rounded-full" />
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-black border-t-transparent animate-spin" />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#080C10] text-white selection:bg-primary/30 pb-20 overflow-x-hidden">
-      
-      {/* ── BACKGROUND MESH ── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-violet/5 rounded-full blur-[100px]" />
-      </div>
+    <div className="min-h-screen bg-white text-black pb-20">
+      <div className="max-w-xl mx-auto px-6 py-10">
 
-      <div className="relative z-10 max-w-xl mx-auto px-6 py-12">
-        
-        {/* ── HEADER ── */}
-        <div className="flex items-center justify-between mb-12 animate-fade-in">
-           <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-[#080C10] shadow-[0_0_20px_rgba(0,229,160,0.3)]">
-                 <Zap size={22} strokeWidth={3} />
-              </div>
-              <h1 className="text-[18px] font-black tracking-tighter uppercase italic">InstaSync</h1>
-           </div>
-           <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-primary/60">
-              Clinical Directory Mode
-           </div>
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-10 border-b-2 border-black pb-4">
+          <h1 className="text-lg font-bold tracking-tight">Book an appointment</h1>
+          <span className="text-xs font-medium text-gray-500 border border-gray-300 px-2 py-1">
+            Instant booking
+          </span>
         </div>
 
-        {/* ── DOCTOR PROFILE CARD ── */}
-        <div className="relative group mb-10 animate-fade-in-up">
-           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-violet/20 blur opacity-30 transition duration-500 rounded-[32px]" />
-           <div className="relative bg-[#0E1419] border border-white/[0.08] rounded-[32px] p-8">
-              <div className="flex items-center gap-6 mb-8 border-b border-white/[0.05] pb-8">
-                 <div className="relative">
-                    <div className="w-24 h-24 rounded-[32px] overflow-hidden border-2 border-primary/20 bg-white/5">
-                       {doctorData.profilePic ? (
-                         <img src={doctorData.profilePic} className="w-full h-full object-cover" />
-                       ) : (
-                         <div className="w-full h-full flex items-center justify-center text-4xl font-black text-white/10">{doctorData.name[0]}</div>
-                       )}
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-primary text-[#080C10] flex items-center justify-center shadow-lg">
-                       <ShieldCheck size={18} strokeWidth={3} />
-                    </div>
-                 </div>
-                 <div>
-                    <h2 className="text-[28px] font-black leading-tight">Dr. {doctorData.name}</h2>
-                    <p className="text-[14px] font-bold text-primary uppercase tracking-widest mt-1 italic">{doctorData.specialization || 'Clinical Expert'}</p>
-                    <div className="flex items-center gap-2 mt-3">
-                       <div className="flex gap-1 text-amber">
-                          {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
-                       </div>
-                       <span className="text-[12px] font-bold text-white/30 truncate">Verified Specialist</span>
-                    </div>
-                 </div>
-              </div>
-
-              {/* PROFESSIONAL BIO (The "About" request) */}
-              <div className="space-y-4 mb-8">
-                 <div className="flex items-center gap-2">
-                    <MessageSquare size={16} className="text-violet" />
-                    <span className="text-[11px] font-black uppercase text-white/30 tracking-widest">Executive Summary</span>
-                 </div>
-                 <p className="text-[14px] text-white/60 leading-relaxed italic">
-                    &quot;{doctorData.about || `Dr. ${doctorData.name} is a dedicated health professional specializing in ${doctorData.specialization || 'General Medicine'} with over ${doctorData.experience || '10'} years of clinical excellence.`}&quot;
-                 </p>
-              </div>
-
-              {/* PROFESSIONAL DETAILS (The "Details" request) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-start gap-3">
-                    <GraduationCap size={18} className="text-primary mt-1" />
-                    <div>
-                       <p className="text-[10px] font-black text-white/20 uppercase">Degree</p>
-                       <p className="text-[13px] font-bold text-white">{doctorData.degree || 'MBBS, MD'}</p>
-                    </div>
-                 </div>
-                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-start gap-3">
-                    <MapPin size={18} className="text-violet mt-1" />
-                    <div>
-                       <p className="text-[10px] font-black text-white/20 uppercase">Practice</p>
-                       <p className="text-[13px] font-bold text-white truncate max-w-[120px]">{doctorData.clinicName || 'City Medical'}</p>
-                    </div>
-                 </div>
-              </div>
-
-              {!isAvailableToday && (
-                <div className="p-4 bg-rose/10 border border-rose/20 rounded-2xl flex items-center gap-3 text-rose mb-6">
-                   <AlertCircle size={20} />
-                   <p className="text-[12px] font-bold italic">Schedule not active today. Booking for tomorrow.</p>
+        {/* DOCTOR PROFILE */}
+        <div className="border-2 border-black mb-8">
+          <div className="flex items-center gap-5 p-6 border-b-2 border-black">
+            <div className="w-20 h-20 border-2 border-black bg-gray-100 flex-shrink-0 overflow-hidden">
+              {doctorData.profilePic ? (
+                <img src={doctorData.profilePic} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-400">
+                  {doctorData.name[0]}
                 </div>
               )}
-           </div>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold leading-tight">Dr. {doctorData.name}</h2>
+              <p className="text-sm font-medium text-gray-600 mt-1">
+                {doctorData.specialization || 'General Medicine'}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex gap-0.5 text-black">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
+                </div>
+                <span className="text-xs text-gray-500">Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 border-b-2 border-black">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageSquare size={14} />
+              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">About</span>
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              {doctorData.about || `Dr. ${doctorData.name} specializes in ${doctorData.specialization || 'General Medicine'} with over ${doctorData.experience || '10'} years of clinical experience.`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2">
+            <div className="p-5 border-r-2 border-black flex items-start gap-3">
+              <GraduationCap size={16} className="mt-0.5" />
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Degree</p>
+                <p className="text-sm font-medium">{doctorData.degree || 'MBBS, MD'}</p>
+              </div>
+            </div>
+            <div className="p-5 flex items-start gap-3">
+              <MapPin size={16} className="mt-0.5" />
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Clinic</p>
+                <p className="text-sm font-medium truncate">{doctorData.clinicName || 'City Medical'}</p>
+              </div>
+            </div>
+          </div>
+
+          {!isAvailableToday && (
+            <div className="p-4 bg-gray-100 border-t-2 border-black flex items-center gap-3">
+              <AlertCircle size={18} />
+              <p className="text-sm font-medium">Doctor is not scheduled today. This will book for tomorrow.</p>
+            </div>
+          )}
         </div>
 
-        {/* ── BOOKING FORM ── */}
-        <form onSubmit={handleBooking} className="space-y-6 animate-fade-in-up delay-150">
-           <div className="space-y-4">
-              <h3 className="text-[18px] font-black uppercase tracking-widest text-white/30 px-2 flex items-center gap-2">
-                 <User size={16} /> Patient Dossier
-              </h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase text-white/40 ml-2">Full Identity</label>
-                    <input 
-                      required
-                      type="text" 
-                      placeholder="e.g. Rahul Sharma"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                    />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase text-white/40 ml-2">Age</label>
-                    <input 
-                      required
-                      type="number" 
-                      placeholder="24"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.age}
-                      onChange={e => setFormData({...formData, age: e.target.value})}
-                    />
-                 </div>
-              </div>
+        {/* BOOKING FORM */}
+        <form onSubmit={handleBooking} className="space-y-8">
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500 flex items-center gap-2">
+              <User size={14} /> Your details
+            </h3>
 
-              <div className="space-y-2">
-                 <label className="text-[11px] font-black uppercase text-white/40 ml-2">Protected Phone Number</label>
-                 <div className="relative">
-                    <Phone size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20" />
-                    <input 
-                      required
-                      type="tel" 
-                      placeholder="+91 00000 00000"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                      value={formData.phone}
-                      onChange={e => setFormData({...formData, phone: e.target.value})}
-                    />
-                 </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">Full name</label>
+                <input
+                  required
+                  type="text"
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full h-12 bg-white border-2 border-black px-4 text-sm focus:outline-none"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                />
               </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">Age</label>
+                <input
+                  required
+                  type="number"
+                  placeholder="24"
+                  className="w-full h-12 bg-white border-2 border-black px-4 text-sm focus:outline-none"
+                  value={formData.age}
+                  onChange={e => setFormData({ ...formData, age: e.target.value })}
+                />
+              </div>
+            </div>
 
-              <div className="space-y-2">
-                 <label className="text-[11px] font-black uppercase text-white/40 ml-2">Clinical Symptoms</label>
-                 <textarea 
-                   required
-                   placeholder="Describe how you feel..."
-                   className="w-full min-h-[100px] py-4 bg-white/5 border border-white/10 rounded-2xl px-5 text-[14px] focus:outline-none focus:border-primary/40 transition-all font-medium"
-                   value={formData.symptoms}
-                   onChange={e => setFormData({...formData, symptoms: e.target.value})}
-                 />
+            <div>
+              <label className="text-xs font-bold text-gray-500 block mb-1">Phone number</label>
+              <div className="relative">
+                <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  required
+                  type="tel"
+                  placeholder="+91 00000 00000"
+                  className="w-full h-12 bg-white border-2 border-black pl-11 pr-4 text-sm focus:outline-none"
+                  value={formData.phone}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                />
               </div>
-           </div>
+            </div>
 
-           <div className="space-y-4 pt-4">
-              <h3 className="text-[18px] font-black uppercase tracking-widest text-white/30 px-2 flex items-center gap-2">
-                 <Activity size={16} /> Transaction Protocol
-              </h3>
-              
-              {/* Only Cash shown here - Static Badge */}
-              <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center gap-3 text-primary">
-                 <DollarSign size={20} />
-                 <span className="text-[13px] font-black uppercase tracking-[2px]">CASH AT CLINIC COUNTER</span>
-                 <CheckCircle size={16} className="ml-auto" />
-              </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 block mb-1">Symptoms</label>
+              <textarea
+                required
+                placeholder="Describe how you feel..."
+                className="w-full min-h-[100px] py-3 bg-white border-2 border-black px-4 text-sm focus:outline-none"
+                value={formData.symptoms}
+                onChange={e => setFormData({ ...formData, symptoms: e.target.value })}
+              />
+            </div>
+          </div>
 
-              <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/5">
-                 <div className="flex justify-between items-center mb-2">
-                    <span className="text-[12px] text-white/30 font-bold uppercase tracking-widest">Clinical Fee</span>
-                    <span className="text-[14px] font-black">₹{doctorData.fees || 699}</span>
-                 </div>
-                 <div className="flex justify-between items-center mb-4">
-                    <span className="text-[12px] text-white/30 font-bold uppercase tracking-widest">Platform Service</span>
-                    <span className="text-[14px] font-black">₹25</span>
-                 </div>
-                 <div className="border-t border-white/5 pt-4 flex justify-between items-center">
-                    <span className="text-[14px] font-black uppercase text-primary tracking-widest">Final Pulse</span>
-                    <span className="text-[24px] font-black tracking-tight">₹{(doctorData.fees || 699) + 25}</span>
-                 </div>
-              </div>
-           </div>
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500 flex items-center gap-2">
+              <Activity size={14} /> Payment
+            </h3>
 
-           <button
-             type="submit"
-             disabled={submitting}
-             className="w-full relative group h-16 rounded-[40px] bg-primary flex items-center justify-center text-[#080C10] shadow-[0_20px_50px_rgba(0,229,160,0.2)] overflow-hidden transition-all active:scale-95 disabled:opacity-50"
-           >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <div className="relative flex items-center gap-3 text-[16px] font-black uppercase tracking-[3px]">
-                 {submitting ? (
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent animate-spin rounded-full" />
-                 ) : (
-                    <>Sync Appointment <ArrowRight size={20} strokeWidth={3} /></>
-                 )}
+            <div className="p-4 border-2 border-black flex items-center gap-3">
+              <span className="text-sm font-bold">Cash at clinic counter</span>
+              <CheckCircle size={16} className="ml-auto" />
+            </div>
+
+            <div className="border-2 border-black p-5">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs text-gray-500 font-medium uppercase">Consultation fee</span>
+                <span className="text-sm font-bold">₹{doctorData.fees || 699}</span>
               </div>
-           </button>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-xs text-gray-500 font-medium uppercase">Platform fee</span>
+                <span className="text-sm font-bold">₹25</span>
+              </div>
+              <div className="border-t-2 border-black pt-3 flex justify-between items-center">
+                <span className="text-sm font-bold uppercase">Total</span>
+                <span className="text-xl font-bold">₹{(doctorData.fees || 699) + 25}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full h-14 bg-black text-white flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide disabled:opacity-50"
+          >
+            {submitting ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin" />
+            ) : (
+              <>Confirm booking <ArrowRight size={16} /></>
+            )}
+          </button>
         </form>
 
-        <p className="text-center text-[10px] text-white/20 uppercase tracking-[4px] mt-12">
-           Encrypted End-to-End • Zeyphra Pulse Core
+        <p className="text-center text-[11px] text-gray-400 mt-10">
+          Your information is kept private.
         </p>
       </div>
 
-      <SuccessPulse 
-        isOpen={showSuccess} 
-        onClose={() => router.push('/patient/home')} 
-        message="Booking Synced!" 
-        subMessage="Redirecting to Portal..."
+      <SuccessPulse
+        isOpen={showSuccess}
+        onClose={() => router.push('/patient/home')}
+        message="Booking confirmed"
+        subMessage="Redirecting..."
       />
-
-      <style>{`
-        .shadow-glow { box-shadow: 0 0 80px rgba(0,229,160,0.1); }
-      `}</style>
     </div>
   );
 }
