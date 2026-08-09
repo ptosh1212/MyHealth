@@ -1,26 +1,23 @@
-# My Health - Web Platform
-
-A modern healthcare platform connecting patients and doctors with real-time notifications.
+https://github-readme-stats.hackclub.dev/api/wakatime?username=55530&api_domain=hackatime.hackclub.com&theme=darcula&custom_title=Hackatime+Stats&layout=compact&cache_seconds=0&langs_count=8
+# My Health
 
 ## Features
 
 ### For Patients
-- 🔍 Search and find doctors by specialty
-- 📅 Book appointments online
-- 💊 Track medicines and prescriptions
-- 📋 View medical records
-- 🔔 Real-time notifications for appointments
-- 💬 Video consultations (coming soon)
+Search and find doctors by specialty
+Book appointments online
+Track medicines and prescriptions
+View medical records
 
-### For Doctors
-- 📊 Dashboard with analytics
-- 👥 Patient management
-- 📅 Appointment scheduling
-- 💰 Earnings tracking
-- 📝 Create prescriptions
-- 🔔 Appointment notifications
+## For Doctors
+Dashboard
+Patient management
+Appointment scheduling
+Earnings trackerr
+Make prescriptions
+Appointment notifications
 
-## Tech Stack
+## Tech Stack Lol
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
@@ -28,8 +25,6 @@ A modern healthcare platform connecting patients and doctors with real-time noti
 - **Backend**: Firebase (Auth, Firestore, Storage, Cloud Messaging)
 - **State Management**: Zustand
 - **Icons**: Lucide React
-- **Real-time**: Socket.io (optional)
-- **Video**: SimplePeer (optional)
 
 ## Getting Started
 
@@ -43,8 +38,7 @@ A modern healthcare platform connecting patients and doctors with real-time noti
 
 1. Install dependencies:
 ```bash
-cd web-platform
-npm install
+npm i
 ```
 
 2. Configure Firebase:
@@ -56,7 +50,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000)
+4. Open (http://localhost:3000)
 
 ## Firebase Setup
 
@@ -77,21 +71,6 @@ Create these collections in Firestore:
 }
 ```
 
-**appointments**
-```json
-{
-    "patientId": "string",
-    "patientName": "string",
-    "doctorId": "string",
-    "doctorName": "string",
-    "specialty": "string",
-    "date": "string (YYYY-MM-DD)",
-    "time": "string (HH:MM)",
-    "status": "pending | confirmed | completed | cancelled",
-    "reason": "string",
-    "createdAt": "timestamp"
-  }
-```
 
 ### 2. Enable Authentication
 - Go to Firebase Console > Authentication
@@ -127,7 +106,7 @@ Users will be prompted to allow notifications on first login.
 ## Project Structure
 
 ```
-web-platform/
+my-health/
 ├── app/
 │   ├── auth/          # Authentication pages
 │   ├── patient/       # Patient dashboard & features
@@ -146,7 +125,7 @@ web-platform/
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel (Recommended Byy MEe)
 
 1. Push code to GitHub
 2. Import project in Vercel
@@ -174,21 +153,7 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
 NEXT_PUBLIC_VAPID_KEY=
-```
 
-## Features to Add
-
-- [ ] Video consultations
-- [ ] Payment integration
-- [ ] Medicine ordering
-- [ ] Chat system
-- [ ] Prescription OCR
-- [ ] Multi-language support
-- [ ] Dark/Light theme toggle
-- [ ] Email notifications
-- [ ] SMS notifications
-
-## License
 
 Private - All rights reserved
 
