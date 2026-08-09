@@ -2,7 +2,7 @@
 
 ![Hackatime Stats](https://github-readme-stats.hackclub.dev/api/wakatime?username=55530\&api_domain=hackatime.hackclub.com\&theme=darcula\&custom_title=Hackatime+Stats\&layout=compact\&cache_seconds=0\&langs_count=8)
 
-This is a health website which I made for patients and doctors. The main idea is to make it easier for patients to find doctors, book appointments and manage their medicines.
+This is a health website which I made for patients and doctors as i suffer frm Seizure Attacks. The main idea is to make it easier for patients to find doctors, book appointments and manage their medicines.
 
 This project is still not fully complete and some things may not work properly.
 
