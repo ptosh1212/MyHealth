@@ -1,72 +1,57 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
 import AuthProvider from "@/components/AuthProvider";
 import RouteGuard from "@/components/RouteGuard";
 import GlobalAlertModal from "@/components/GlobalAlertModal";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const SITE_URL = "https://my-health-fawn.vercel.app";
-const CALLSIGN = "APINCODER";
-const PERSON_NAME = "Anant Prakash";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
     default: "My Health — APINCODER | Anant Prakash",
-    template: "%s | APINCODER — Anant Prakash",
+    template: "%s | My Health",
   },
 
   description:
-    "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
+    "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
 
   keywords: [
     "APINCODER",
     "Anant Prakash",
-    "APINCODER Anant Prakash",
-    "Anant Prakash APINCODER",
-    "Anant",
-    "Anant Prakash developer",
-    "APINCODER developer",
-    "AI developer",
-    "AI builder",
-    "software developer",
     "My Health",
-    "My Health clinic management",
-    "clinic management system India",
-    "doctor clinic software",
-    "patient token system",
-    "walk-in patient management",
-    "online appointment clinic",
+    "APINCODER My Health",
+    "Anant Prakash My Health",
+    "doctor patient platform",
+    "clinic management system",
     "clinic queue management",
-    "WhatsApp patient updates",
-    "doctor dashboard India",
-    "small clinic software",
-    "clinic operating system",
-    "clinic management app",
-    "reception management software",
-    "doctor appointment software India",
-    "clinic management SaaS India",
-    "patient queue system",
-    "digital clinic India",
-    "outpatient management",
-    "OPD management software",
-    "clinic automation India",
+    "patient token system",
+    "doctor dashboard",
+    "online appointments",
+    "healthcare platform India",
   ],
 
   authors: [
     {
-      name: PERSON_NAME,
+      name: "Anant Prakash",
       url: SITE_URL,
     },
   ],
 
-  creator: PERSON_NAME,
-  publisher: PERSON_NAME,
+  creator: "Anant Prakash (APINCODER)",
+  publisher: "My Health",
 
   applicationName: "My Health",
+
+  category: "healthcare",
 
   formatDetection: {
     email: false,
@@ -75,16 +60,20 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: SITE_URL,
+    canonical: "/",
   },
 
   openGraph: {
     type: "website",
+    locale: "en_IN",
     url: SITE_URL,
-    siteName: "My Health — APINCODER",
+    siteName: "My Health",
+
     title: "My Health — APINCODER | Anant Prakash",
+
     description:
-      "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
+      "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
+
     images: [
       {
         url: "/og-image.png",
@@ -93,16 +82,17 @@ export const metadata: Metadata = {
         alt: "My Health — APINCODER | Anant Prakash",
       },
     ],
-    locale: "en_IN",
   },
 
   twitter: {
     card: "summary_large_image",
+
     title: "My Health — APINCODER | Anant Prakash",
+
     description:
-      "My Health is created by Anant Prakash, known online as APINCODER.",
+      "My Health — a healthcare platform created and developed by APINCODER (Anant Prakash).",
+
     images: ["/og-image.png"],
-    creator: "@ananthealth",
   },
 
   robots: {
@@ -122,6 +112,7 @@ export const metadata: Metadata = {
     icon: [
       {
         url: "/icon.png",
+        type: "image/png",
       },
       {
         url: "/icon.png",
@@ -139,34 +130,20 @@ export const metadata: Metadata = {
       {
         url: "/apple-icon.png",
         sizes: "180x180",
-      },
-    ],
-
-    other: [
-      {
-        rel: "mask-icon",
-        url: "/safari-pinned-tab.svg",
+        type: "image/png",
       },
     ],
   },
 
   manifest: "/manifest.json",
-
-  verification: {
-    // Add your REAL Google Search Console verification code here
-    // after Google gives it to you.
-    //
-    // google: "YOUR_REAL_GOOGLE_VERIFICATION_CODE",
-  },
-
-  category: "healthcare",
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#FAFAF8",
 };
 
 export default function RootLayout({
@@ -174,256 +151,104 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /*
-   * ============================================================
-   * WEBSITE SCHEMA
-   *
-   * Establishes:
-   *
-   * APINCODER
-   *      ↓
-   * Anant Prakash
-   *      ↓
-   * My Health
-   * ============================================================
-   */
-
-  const websiteSchema = {
+  const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
 
-    "@id": `${SITE_URL}/#website`,
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
 
-    name: "My Health",
+        name: "My Health",
 
-    alternateName: [
-      "APINCODER",
-      "Anant Prakash",
-      "My Health — APINCODER",
+        alternateName: [
+          "My Health by APINCODER",
+          "APINCODER",
+        ],
+
+        url: SITE_URL,
+
+        description:
+          "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash).",
+
+        publisher: {
+          "@id": `${SITE_URL}/#creator`,
+        },
+
+        inLanguage: "en-IN",
+      },
+
+      {
+        "@type": "Person",
+        "@id": `${SITE_URL}/#creator`,
+
+        name: "Anant Prakash",
+
+        alternateName: "APINCODER",
+
+        url: SITE_URL,
+
+        jobTitle: "Developer",
+
+        knowsAbout: [
+          "Software Development",
+          "Web Development",
+          "Healthcare Technology",
+          "Artificial Intelligence",
+        ],
+      },
+
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${SITE_URL}/#application`,
+
+        name: "My Health",
+
+        alternateName: "My Health by APINCODER",
+
+        applicationCategory: "HealthApplication",
+
+        operatingSystem: "Web",
+
+        url: SITE_URL,
+
+        description:
+          "A digital healthcare platform created and developed by APINCODER (Anant Prakash) for connecting doctors and patients.",
+
+        creator: {
+          "@id": `${SITE_URL}/#creator`,
+        },
+
+        author: {
+          "@id": `${SITE_URL}/#creator`,
+        },
+
+        image: `${SITE_URL}/og-image.png`,
+      },
     ],
-
-    url: SITE_URL,
-
-    description:
-      "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
-
-    inLanguage: "en-IN",
-
-    publisher: {
-      "@id": `${SITE_URL}/#person`,
-    },
-  };
-
-  /*
-   * ============================================================
-   * PERSON SCHEMA
-   *
-   * This is the important relationship:
-   *
-   * Anant Prakash
-   *      ↕
-   * APINCODER
-   * ============================================================
-   */
-
-  const personSchema = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-
-    "@id": `${SITE_URL}/#person`,
-
-    name: PERSON_NAME,
-
-    alternateName: CALLSIGN,
-
-    url: SITE_URL,
-
-    description:
-      `${PERSON_NAME} is a developer and AI builder known online as ${CALLSIGN}.`,
-
-    jobTitle: "Developer",
-
-    knowsAbout: [
-      "Software development",
-      "Artificial intelligence",
-      "Web development",
-      "Next.js",
-      "React",
-      "Firebase",
-      "AI development",
-    ],
-
-    mainEntityOfPage: {
-      "@id": `${SITE_URL}/#website`,
-    },
-  };
-
-  /*
-   * ============================================================
-   * WEBPAGE SCHEMA
-   * ============================================================
-   */
-
-  const webpageSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-
-    "@id": `${SITE_URL}/#webpage`,
-
-    url: SITE_URL,
-
-    name: "My Health — APINCODER | Anant Prakash",
-
-    description:
-      `Official My Health website created by ${PERSON_NAME}, also known online as ${CALLSIGN}.`,
-
-    isPartOf: {
-      "@id": `${SITE_URL}/#website`,
-    },
-
-    about: {
-      "@id": `${SITE_URL}/#person`,
-    },
-
-    author: {
-      "@id": `${SITE_URL}/#person`,
-    },
-
-    inLanguage: "en-IN",
-  };
-
-  /*
-   * ============================================================
-   * SOFTWARE APPLICATION SCHEMA
-   *
-   * Keeps My Health represented as the actual application,
-   * instead of pretending the whole site is a personal portfolio.
-   * ============================================================
-   */
-
-  const softwareSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-
-    name: "My Health",
-
-    applicationCategory: "HealthApplication",
-
-    operatingSystem: "Web",
-
-    url: SITE_URL,
-
-    description:
-      "A clinic management system for managing patients, appointments, queues and clinic operations.",
-
-    author: {
-      "@id": `${SITE_URL}/#person`,
-    },
-
-    creator: {
-      "@id": `${SITE_URL}/#person`,
-    },
   };
 
   return (
     <html lang="en">
       <head>
-        {/* ======================================================
-            FONT CONNECTIONS
-        ======================================================= */}
+        {/* Google Search Console verification is handled by:
+            public/google425bea4ba542ded0.html */}
 
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
-
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-
-        {/* ======================================================
-            THEME
-        ======================================================= */}
-
-        <meta
-          name="theme-color"
-          content="#FFFFFF"
-        />
-
-        <meta
-          name="apple-mobile-web-app-capable"
-          content="yes"
-        />
-
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
-
-        {/* ======================================================
-            WEBSITE STRUCTURED DATA
-        ======================================================= */}
-
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
+            __html: JSON.stringify(structuredData),
           }}
         />
 
-        {/* ======================================================
-            PERSON STRUCTURED DATA
-        ======================================================= */}
-
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(personSchema),
-          }}
-        />
-
-        {/* ======================================================
-            WEBPAGE STRUCTURED DATA
-        ======================================================= */}
-
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(webpageSchema),
-          }}
-        />
-
-        {/* ======================================================
-            SOFTWARE STRUCTURED DATA
-        ======================================================= */}
-
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(softwareSchema),
-          }}
-        />
-
-        {/* ======================================================
-            LOTTIE
-        ======================================================= */}
-
+        {/* Lottie Player */}
         <script
           src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
           defer
         />
 
-        {/* ======================================================
-            GOOGLE ADS / CONVERSION TRACKING
-        ======================================================= */}
-
+        {/* Google Ads / gtag.js */}
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-18021935082"
@@ -465,7 +290,6 @@ export default function RootLayout({
         <AuthProvider>
           <RouteGuard>
             {children}
-
             <GlobalAlertModal />
           </RouteGuard>
         </AuthProvider>
