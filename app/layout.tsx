@@ -7,104 +7,163 @@ import GlobalAlertModal from "@/components/GlobalAlertModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const SITE_URL = "https://my-health-fawn.vercel.app";
+const CALLSIGN = "APINCODER";
+const PERSON_NAME = "Anant Prakash";
+
 export const metadata: Metadata = {
-  title: "My Health :)",
-  description: "My Health is a clinic management system built for Indian doctors. Manage walk-in patients, online bookings, token queue and WhatsApp updates — all in one simple dashboard. NOT a patient marketplace.",
+  metadataBase: new URL(SITE_URL),
+
+  title: {
+    default: "My Health — APINCODER | Anant Prakash",
+    template: "%s | APINCODER — Anant Prakash",
+  },
+
+  description:
+    "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
+
   keywords: [
+    "APINCODER",
+    "Anant Prakash",
+    "APINCODER Anant Prakash",
+    "Anant Prakash APINCODER",
+    "Anant",
+    "Anant Prakash developer",
+    "APINCODER developer",
+    "AI developer",
+    "AI builder",
+    "software developer",
+    "My Health",
+    "My Health clinic management",
     "clinic management system India",
     "doctor clinic software",
     "patient token system",
     "walk-in patient management",
     "online appointment clinic",
     "clinic queue management",
-    "whatsapp patient updates",
+    "WhatsApp patient updates",
     "doctor dashboard India",
     "small clinic software",
     "clinic operating system",
-    "My Health",
     "clinic management app",
     "reception management software",
     "doctor appointment software India",
-    "clinic management saas India",
+    "clinic management SaaS India",
     "patient queue system",
     "digital clinic India",
     "outpatient management",
     "OPD management software",
-    "clinic automation India"
+    "clinic automation India",
   ],
-  authors: [{ name: "My Health" }],
-  creator: "My Health",
-  publisher: "My Health",
+
+  authors: [
+    {
+      name: PERSON_NAME,
+      url: SITE_URL,
+    },
+  ],
+
+  creator: PERSON_NAME,
+  publisher: PERSON_NAME,
+
+  applicationName: "My Health",
+
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://my-health-fawn.vercel.app/'),
+
   alternates: {
-    canonical: '/',
+    canonical: SITE_URL,
   },
+
   openGraph: {
-    title: "My Health - Book Doctors Online | Skip the Line",
-    description: "Book doctor appointments instantly. Get ambulance in 10 minutes, medicines delivered fast. Smart queue system, digital prescriptions.",
-    url: 'https://my-health-fawn.vercel.app/',
-    siteName: 'My Health',
+    type: "website",
+    url: SITE_URL,
+    siteName: "My Health — APINCODER",
+    title: "My Health — APINCODER | Anant Prakash",
+    description:
+      "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: 'My Health - Your Healthcare Assistant',
+        alt: "My Health — APINCODER | Anant Prakash",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_IN",
   },
+
   twitter: {
-    card: 'summary_large_image',
-    title: 'My Health - Book Doctors Online',
-    description: 'Book appointments instantly. Ambulance in 10 min. Smart queue system.',
-    images: ['/og-image.png'],
-    creator: '@ananthealth',
+    card: "summary_large_image",
+    title: "My Health — APINCODER | Anant Prakash",
+    description:
+      "My Health is created by Anant Prakash, known online as APINCODER.",
+    images: ["/og-image.png"],
+    creator: "@ananthealth",
   },
+
   robots: {
     index: true,
     follow: true,
+
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
+
   icons: {
     icon: [
-      { url: '/icon.png' },
-      { url: '/icon.png', sizes: '16x16', type: 'image/png' },
-      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      {
+        url: "/icon.png",
+      },
+      {
+        url: "/icon.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/icon.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
     ],
+
     apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+      {
+        url: "/apple-icon.png",
+        sizes: "180x180",
+      },
     ],
+
     other: [
       {
-        rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
       },
     ],
   },
-  manifest: '/manifest.json',
+
+  manifest: "/manifest.json",
+
   verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    yahoo: 'your-yahoo-verification-code',
+    // Add your REAL Google Search Console verification code here
+    // after Google gives it to you.
+    //
+    // google: "YOUR_REAL_GOOGLE_VERIFICATION_CODE",
   },
-  category: 'healthcare',
+
+  category: "healthcare",
 };
 
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
@@ -115,82 +174,298 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /*
+   * ============================================================
+   * WEBSITE SCHEMA
+   *
+   * Establishes:
+   *
+   * APINCODER
+   *      ↓
+   * Anant Prakash
+   *      ↓
+   * My Health
+   * ============================================================
+   */
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+
+    "@id": `${SITE_URL}/#website`,
+
+    name: "My Health",
+
+    alternateName: [
+      "APINCODER",
+      "Anant Prakash",
+      "My Health — APINCODER",
+    ],
+
+    url: SITE_URL,
+
+    description:
+      "My Health is a clinic management system created by Anant Prakash, known online as APINCODER.",
+
+    inLanguage: "en-IN",
+
+    publisher: {
+      "@id": `${SITE_URL}/#person`,
+    },
+  };
+
+  /*
+   * ============================================================
+   * PERSON SCHEMA
+   *
+   * This is the important relationship:
+   *
+   * Anant Prakash
+   *      ↕
+   * APINCODER
+   * ============================================================
+   */
+
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+
+    "@id": `${SITE_URL}/#person`,
+
+    name: PERSON_NAME,
+
+    alternateName: CALLSIGN,
+
+    url: SITE_URL,
+
+    description:
+      `${PERSON_NAME} is a developer and AI builder known online as ${CALLSIGN}.`,
+
+    jobTitle: "Developer",
+
+    knowsAbout: [
+      "Software development",
+      "Artificial intelligence",
+      "Web development",
+      "Next.js",
+      "React",
+      "Firebase",
+      "AI development",
+    ],
+
+    mainEntityOfPage: {
+      "@id": `${SITE_URL}/#website`,
+    },
+  };
+
+  /*
+   * ============================================================
+   * WEBPAGE SCHEMA
+   * ============================================================
+   */
+
+  const webpageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+
+    "@id": `${SITE_URL}/#webpage`,
+
+    url: SITE_URL,
+
+    name: "My Health — APINCODER | Anant Prakash",
+
+    description:
+      `Official My Health website created by ${PERSON_NAME}, also known online as ${CALLSIGN}.`,
+
+    isPartOf: {
+      "@id": `${SITE_URL}/#website`,
+    },
+
+    about: {
+      "@id": `${SITE_URL}/#person`,
+    },
+
+    author: {
+      "@id": `${SITE_URL}/#person`,
+    },
+
+    inLanguage: "en-IN",
+  };
+
+  /*
+   * ============================================================
+   * SOFTWARE APPLICATION SCHEMA
+   *
+   * Keeps My Health represented as the actual application,
+   * instead of pretending the whole site is a personal portfolio.
+   * ============================================================
+   */
+
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+
+    name: "My Health",
+
+    applicationCategory: "HealthApplication",
+
+    operatingSystem: "Web",
+
+    url: SITE_URL,
+
+    description:
+      "A clinic management system for managing patients, appointments, queues and clinic operations.",
+
+    author: {
+      "@id": `${SITE_URL}/#person`,
+    },
+
+    creator: {
+      "@id": `${SITE_URL}/#person`,
+    },
+  };
+
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-        <meta name="theme-color" content="#FFFFFF" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        
-        {/* Structured Data for SEO */}
+        {/* ======================================================
+            FONT CONNECTIONS
+        ======================================================= */}
+
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* ======================================================
+            THEME
+        ======================================================= */}
+
+        <meta
+          name="theme-color"
+          content="#FFFFFF"
+        />
+
+        <meta
+          name="apple-mobile-web-app-capable"
+          content="yes"
+        />
+
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
+
+        {/* ======================================================
+            WEBSITE STRUCTURED DATA
+        ======================================================= */}
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "MedicalBusiness",
-              "name": "My Health",
-              "description": "Online healthcare platform for booking doctors, ambulance services, and medicine delivery",
-              "url": "https://my-health-fawn.vercel.app/",
-              "logo": "https://my-health-fawn.vercel.app/logo.svg",
-              "image": "https://my-health-fawn.vercel.app/og-image.png",
-              "priceRange": "₹₹",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "IN"
-              },
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.9",
-                "reviewCount": "10000"
-              },
-              "sameAs": [
-                "https://twitter.com/ananthealth",
-                "https://facebook.com/ananthealth",
-                "https://instagram.com/ananthealth"
-              ],
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://my-health-fawn.vercel.app/patient/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            })
+            __html: JSON.stringify(websiteSchema),
           }}
         />
-        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
-        
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18021935082"></script>
+
+        {/* ======================================================
+            PERSON STRUCTURED DATA
+        ======================================================= */}
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personSchema),
+          }}
+        />
+
+        {/* ======================================================
+            WEBPAGE STRUCTURED DATA
+        ======================================================= */}
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webpageSchema),
+          }}
+        />
+
+        {/* ======================================================
+            SOFTWARE STRUCTURED DATA
+        ======================================================= */}
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(softwareSchema),
+          }}
+        />
+
+        {/* ======================================================
+            LOTTIE
+        ======================================================= */}
+
+        <script
+          src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
+          defer
+        />
+
+        {/* ======================================================
+            GOOGLE ADS / CONVERSION TRACKING
+        ======================================================= */}
+
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18021935082"
+        />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
+
+              function gtag() {
+                dataLayer.push(arguments);
+              }
+
               gtag('js', new Date());
+
               gtag('config', 'AW-18021935082');
+
               window.gtag_report_conversion = function(url) {
-                var callback = function () {
-                  if (typeof(url) != 'undefined') {
+                var callback = function() {
+                  if (typeof url !== 'undefined') {
                     window.location = url;
                   }
                 };
-                window.gtag('event', 'conversion', {
-                    'send_to': 'AW-18021935082/hQDFCMD24owcEOrPw5FD',
-                    'event_callback': callback
+
+                gtag('event', 'conversion', {
+                  'send_to': 'AW-18021935082/hQDFCMD24owcEOrPw5FD',
+                  'event_callback': callback
                 });
+
                 return false;
               };
             `,
           }}
         />
       </head>
+
       <body className={inter.className}>
         <AuthProvider>
           <RouteGuard>
             {children}
+
             <GlobalAlertModal />
           </RouteGuard>
         </AuthProvider>
