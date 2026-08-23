@@ -17,19 +17,19 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "My Health — APINCODER | Anant Prakash",
+    default: "My Health — THEKA101YBA",
     template: "%s | My Health",
   },
 
   description:
-    "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
+    "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar), connecting doctors and patients through a simple digital clinic system.",
 
   keywords: [
-    "APINCODER",
-    "Anant Prakash",
+    "THEKA101YBA",
+    "P Kumar",
     "My Health",
-    "APINCODER My Health",
-    "Anant Prakash My Health",
+    "THEKA101YBA My Health",
+    "P Kumar My Health",
     "doctor patient platform",
     "clinic management system",
     "clinic queue management",
@@ -41,12 +41,12 @@ export const metadata: Metadata = {
 
   authors: [
     {
-      name: "Anant Prakash",
+      name: "P Kumar",
       url: SITE_URL,
     },
   ],
 
-  creator: "Anant Prakash (APINCODER)",
+  creator: "P Kumar (THEKA101YBA)",
   publisher: "My Health",
 
   applicationName: "My Health",
@@ -69,17 +69,17 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "My Health",
 
-    title: "My Health — APINCODER | Anant Prakash",
+    title: "My Health — THEKA101YBA | P Kumar",
 
     description:
-      "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
+      "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar), connecting doctors and patients through a simple digital clinic system.",
 
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "My Health — APINCODER | Anant Prakash",
+        alt: "My Health — THEKA101YBA | P Kumar",
       },
     ],
   },
@@ -87,10 +87,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
 
-    title: "My Health — APINCODER | Anant Prakash",
+    title: "My Health — THEKA101YBA | P Kumar",
 
     description:
-      "My Health — a healthcare platform created and developed by APINCODER (Anant Prakash).",
+      "My Health — a healthcare platform created and developed by THEKA101YBA (P Kumar).",
 
     images: ["/og-image.png"],
   },
@@ -162,14 +162,14 @@ export default function RootLayout({
         name: "My Health",
 
         alternateName: [
-          "My Health by APINCODER",
-          "APINCODER",
+          "My Health by THEKA101YBA",
+          "THEKA101YBA",
         ],
 
         url: SITE_URL,
 
         description:
-          "My Health is a healthcare platform created and developed by APINCODER (Anant Prakash).",
+          "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar).",
 
         publisher: {
           "@id": `${SITE_URL}/#creator`,
@@ -182,9 +182,9 @@ export default function RootLayout({
         "@type": "Person",
         "@id": `${SITE_URL}/#creator`,
 
-        name: "Anant Prakash",
+        name: "P Kumar",
 
-        alternateName: "APINCODER",
+        alternateName: "THEKA101YBA",
 
         url: SITE_URL,
 
@@ -204,7 +204,7 @@ export default function RootLayout({
 
         name: "My Health",
 
-        alternateName: "My Health by APINCODER",
+        alternateName: "My Health by THEKA101YBA",
 
         applicationCategory: "HealthApplication",
 
@@ -213,7 +213,7 @@ export default function RootLayout({
         url: SITE_URL,
 
         description:
-          "A digital healthcare platform created and developed by APINCODER (Anant Prakash) for connecting doctors and patients.",
+          "A digital healthcare platform created and developed by THEKA101YBA (P Kumar) for connecting doctors and patients.",
 
         creator: {
           "@id": `${SITE_URL}/#creator`,
