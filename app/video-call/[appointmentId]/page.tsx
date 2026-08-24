@@ -8,40 +8,56 @@ import {
   setDoc,
   Timestamp,
 } from 'firebase/firestore';
+
 import { db } from '@/lib/firebase';
 import { useAuthStore } from '@/lib/store';
 import VideoCall from '@/components/video/VideoCall';
+
 import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
 
-export default function VideoCallPage() {
 
+interface Booking {
+  id: string;
+  doctorId: string;
+  userId: string;
+  status: string;
+
+  doctorName?: string;
+  patientName?: string;
+
+  appointmentDateStr?: string;
+  queueNumber?: number;
+
+  roomId?: string;
+}
+
+
+export default function VideoCallPage() {
   const params = useParams();
   const router = useRouter();
 
   const { user, userRole } = useAuthStore();
 
-  const appointmentId =
-    params?.appointmentId as string;
+  const appointmentId = params?.appointmentId as string;
 
   const [loading, setLoading] = useState(true);
+
   const [appointment, setAppointment] =
-    useState<any>(null);
+    useState<Booking | null>(null);
 
   const [error, setError] = useState('');
 
-  useEffect(() => {
 
+  useEffect(() => {
     if (!user?.uid || !appointmentId) {
       return;
     }
 
     const loadAppointment = async () => {
-
       try {
-
         /*
          * Get booking
          */
@@ -52,33 +68,56 @@ export default function VideoCallPage() {
         const bookingSnap =
           await getDoc(bookingRef);
 
+
         if (!bookingSnap.exists()) {
-
           setError('Appointment not found.');
-
           return;
         }
 
-        const booking = {
-          id: bookingSnap.id,
-          ...bookingSnap.data(),
-        };
 
         /*
-         * Check whether user belongs
-         * to this appointment.
+         * Explicitly tell TypeScript
+         * what fields exist in the booking.
+         */
+
+        const bookingData = bookingSnap.data();
+
+        const booking: Booking = {
+          id: bookingSnap.id,
+
+          doctorId: bookingData.doctorId || '',
+
+          userId: bookingData.userId || '',
+
+          status: bookingData.status || '',
+
+          doctorName: bookingData.doctorName,
+
+          patientName: bookingData.patientName,
+
+          appointmentDateStr:
+            bookingData.appointmentDateStr,
+
+          queueNumber:
+            bookingData.queueNumber,
+        };
+
+
+        /*
+         * Check authorization
          */
 
         const isDoctor =
           userRole === 'doctor' &&
           booking.doctorId === user.uid;
 
+
         const isPatient =
           userRole === 'patient' &&
           booking.userId === user.uid;
 
-        if (!isDoctor && !isPatient) {
 
+        if (!isDoctor && !isPatient) {
           setError(
             'You are not authorized to join this consultation.'
           );
@@ -86,13 +125,13 @@ export default function VideoCallPage() {
           return;
         }
 
+
         /*
          * Only confirmed appointments
          * can use video consultation.
          */
 
         if (booking.status !== 'confirmed') {
-
           setError(
             'This appointment is not available for video consultation.'
           );
@@ -100,27 +139,29 @@ export default function VideoCallPage() {
           return;
         }
 
+
         /*
-         * One room per appointment.
+         * One room per appointment
          */
 
         const roomId =
           `appointment_${appointmentId}`;
 
+
         const roomRef =
           doc(db, 'videoCalls', roomId);
+
 
         const roomSnap =
           await getDoc(roomRef);
 
+
         /*
-         * Doctor creates room.
+         * Doctor creates the room
          */
 
         if (!roomSnap.exists() && isDoctor) {
-
           await setDoc(roomRef, {
-
             roomId,
 
             appointmentId,
@@ -134,17 +175,21 @@ export default function VideoCallPage() {
             createdAt: Timestamp.now(),
 
             updatedAt: Timestamp.now(),
-
           });
         }
 
+
+        /*
+         * Save appointment locally
+         */
+
         setAppointment({
           ...booking,
+
           roomId,
         });
 
       } catch (error) {
-
         console.error(
           'Video page error:',
           error
@@ -155,10 +200,10 @@ export default function VideoCallPage() {
         );
 
       } finally {
-
         setLoading(false);
       }
     };
+
 
     loadAppointment();
 
@@ -168,12 +213,12 @@ export default function VideoCallPage() {
     appointmentId,
   ]);
 
+
   /*
-   * Loading
+   * Loading screen
    */
 
   if (loading) {
-
     return (
       <div className="min-h-screen bg-[#080808] flex items-center justify-center">
 
@@ -194,12 +239,12 @@ export default function VideoCallPage() {
     );
   }
 
+
   /*
-   * Error
+   * Error screen
    */
 
   if (error || !appointment) {
-
     return (
       <div className="min-h-screen bg-[#080808] flex items-center justify-center px-6">
 
@@ -231,6 +276,7 @@ export default function VideoCallPage() {
     );
   }
 
+
   /*
    * Determine role
    */
@@ -240,14 +286,15 @@ export default function VideoCallPage() {
       ? 'doctor'
       : 'patient';
 
+
   /*
-   * Start video call
+   * Start video consultation
    */
 
   return (
     <VideoCall
       appointmentId={appointment.id}
-      roomId={appointment.roomId}
+      roomId={appointment.roomId!}
       role={role}
       onEnd={() => router.back()}
     />
