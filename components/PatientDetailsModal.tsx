@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { X, User, Phone, Mail, MapPin, FileText, AlertCircle, ChevronRight, History, ClipboardList } from 'lucide-react';
+import { X, User, Phone, Mail, MapPin, FileText, AlertCircle, ChevronRight, History, ClipboardList, Video } from 'lucide-react';
+import Link from 'next/link';
 
 interface PatientDetailsModalProps {
   booking: any;
@@ -246,6 +247,16 @@ export default function PatientDetailsModal({ booking, onClose }: PatientDetails
 
         {/* Footer Actions */}
         <div className="p-6 border-t border-gray-100 bg-white">
+           {booking.status === 'confirmed' && (
+          <Link
+         href={`/video-call/${booking.id}`}
+         onClick={onClose}
+         className="w-full h-[50px] rounded-sm bg-teal-600 hover:bg-teal-700 text-white text-[14px] font-semibold transition-colors flex items-center justify-center gap-2 mb-3">
+          <Video size={17} />
+          Start Video Consultation
+          </Link>
+  )}
+
            <button
              onClick={onClose}
              className="w-full h-[50px] rounded-sm bg-teal-600 hover:bg-teal-700 text-white text-[14px] font-semibold transition-colors"

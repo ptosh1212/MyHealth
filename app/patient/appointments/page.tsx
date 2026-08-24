@@ -12,11 +12,12 @@ import { ListSkeleton } from '@/components/SkeletonLoader';
 import { 
   Calendar, Clock, Stethoscope, Zap, FileText, Star, 
   XCircle, ChevronRight, X, AlertTriangle, CheckCircle, 
-  Clock3, Users, ArrowRight, MessageCircle
+  Clock3, Users, ArrowRight, MessageCircle, Video
 } from 'lucide-react';
 import ChatPortal from '@/components/ChatPortal';
 import { getOrCreateChat } from '@/lib/chat';
 import Link from 'next/link';
+
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -385,6 +386,15 @@ export default function Appointments() {
 
               {/* Actions */}
               <div className="space-y-2.5 pt-1">
+                {selectedAppointment.status === 'confirmed' && (
+                <Link
+                  href={`/video-call/${selectedAppointment.id}`}
+                   onClick={() => setShowDetails(false)}
+                   className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-teal-600 text-white font-bold text-[14px] hover:bg-teal-700 transition">
+                  <Video size={17} />
+                    Join Video Consultation
+                      </Link>
+)}
                 {selectedAppointment.status === 'completed' && !selectedAppointment.rating && (
                   <button
                     onClick={() => { setShowDetails(false); setAppointmentToRate(selectedAppointment); setIsRatingModalOpen(true); }}
