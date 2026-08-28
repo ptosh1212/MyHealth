@@ -17,19 +17,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "My Health — THEKA101YBA",
+    default: "My Health — Anant Prakash",
     template: "%s | My Health",
   },
 
   description:
-    "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar), connecting doctors and patients through a simple digital clinic system.",
+    "My Health is a healthcare platform created and developed by Anant Prakash, connecting doctors and patients through a simple digital clinic system.",
 
   keywords: [
-    "THEKA101YBA",
-    "P Kumar",
+    "Anant Prakash",
     "My Health",
-    "THEKA101YBA My Health",
-    "P Kumar My Health",
+    "Anant Prakash My Health",
     "doctor patient platform",
     "clinic management system",
     "clinic queue management",
@@ -41,12 +39,12 @@ export const metadata: Metadata = {
 
   authors: [
     {
-      name: "P Kumar",
+      name: "Anant Prakash",
       url: SITE_URL,
     },
   ],
 
-  creator: "P Kumar (THEKA101YBA)",
+  creator: "Anant Prakash",
   publisher: "My Health",
 
   applicationName: "My Health",
@@ -69,17 +67,17 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "My Health",
 
-    title: "My Health — THEKA101YBA | P Kumar",
+    title: "My Health — Anant Prakash",
 
     description:
-      "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar), connecting doctors and patients through a simple digital clinic system.",
+      "My Health is a healthcare platform created and developed by Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
 
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "My Health — THEKA101YBA | P Kumar",
+        alt: "My Health — Anant Prakash",
       },
     ],
   },
@@ -87,10 +85,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
 
-    title: "My Health — THEKA101YBA | P Kumar",
+    title: "My Health — Anant Prakash",
 
     description:
-      "My Health — a healthcare platform created and developed by THEKA101YBA (P Kumar).",
+      "My Health — a healthcare platform created and developed by Anant Prakash.",
 
     images: ["/og-image.png"],
   },
@@ -162,14 +160,13 @@ export default function RootLayout({
         name: "My Health",
 
         alternateName: [
-          "My Health by THEKA101YBA",
-          "THEKA101YBA",
+          "My Health by Anant Prakash",
         ],
 
         url: SITE_URL,
 
         description:
-          "My Health is a healthcare platform created and developed by THEKA101YBA (P Kumar).",
+          "My Health is a healthcare platform created and developed by Anant Prakash.",
 
         publisher: {
           "@id": `${SITE_URL}/#creator`,
@@ -182,9 +179,8 @@ export default function RootLayout({
         "@type": "Person",
         "@id": `${SITE_URL}/#creator`,
 
-        name: "P Kumar",
+        name: "Anant Prakash",
 
-        alternateName: "THEKA101YBA",
 
         url: SITE_URL,
 
@@ -204,7 +200,7 @@ export default function RootLayout({
 
         name: "My Health",
 
-        alternateName: "My Health by THEKA101YBA",
+        alternateName: "My Health by Anant Prakash",
 
         applicationCategory: "HealthApplication",
 
@@ -213,7 +209,7 @@ export default function RootLayout({
         url: SITE_URL,
 
         description:
-          "A digital healthcare platform created and developed by THEKA101YBA (P Kumar) for connecting doctors and patients.",
+          "A digital healthcare platform created and developed by Anant Prakash for connecting doctors and patients.",
 
         creator: {
           "@id": `${SITE_URL}/#creator`,
