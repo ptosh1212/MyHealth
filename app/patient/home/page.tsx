@@ -319,7 +319,7 @@ export default function PatientHome() {
           </span>
 
           <ChevronRight
-            size={18}
+            size={9}
             className="absolute right-4"
           />
         </Link>
