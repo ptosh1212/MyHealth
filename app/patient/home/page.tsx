@@ -307,20 +307,19 @@ export default function PatientHome() {
 
         </button>
 
-{/* ── YOUR PRESCRIPTIONS ── */}
-<Link
-  href="/prescriptions"
-  className="w-full h-[10px] rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-[15px] font-semibold flex items-center justify-center gap-2 group transition-colors active:scale-[0.98] relative"
->
-  <FileText size={6} />
-  
-  Your Appointments
-
-  <ChevronRight
-    size={6}
-    className="group-hover:translate-x-1 transition-transform"
-  />
-</Link>
+<div className="flex justify-center">
+  <Link
+    href="/patient/appointments"
+    className="inline-flex h-9 px-3 rounded-lg border border-teal-600 bg-white hover:bg-teal-50 text-teal-600 hover:text-teal-700 text-[12px] font-semibold items-center justify-center gap-1.5 group transition-all active:scale-[0.98]"
+  >
+    <FileText size={14} />
+    Your Appointments
+    <ChevronRight
+      size={14}
+      className="group-hover:translate-x-1 transition-transform"
+    />
+  </Link>
+</div>
 
         {/* ── LIVE QUEUE ALERT ── */}
         {todayBookings
