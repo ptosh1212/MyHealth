@@ -309,7 +309,7 @@ export default function PatientHome() {
 
         {/* ── YOUR PRESCRIPTIONS ── */}
         <Link
-          href="/prescriptions"
+          href="patient/home/prescriptions"
           className="w-full h-14 rounded-xl bg-green-800 hover:bg-green-900 text-white font-semibold flex items-center justify-center gap-3 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
         >
           <FileText size={20} />
