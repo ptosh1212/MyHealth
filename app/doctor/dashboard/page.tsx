@@ -360,7 +360,7 @@ export default function DoctorDashboard() {
               { label: "Today's patients", value: todayBookings.length, icon: Calendar },
               { label: 'Pending', value: pending.length, icon: Clock },
               { label: 'Confirmed', value: confirmed.length, icon: CheckCircle },
-              { label: 'Earnings today', value: `₹${todayEarnings.toLocaleString('en-IN')}`, icon: IndianRupee },
+              { label: 'Total Earnings', value: `₹${todayEarnings.toLocaleString('en-IN')}`, icon: IndianRupee },
             ].map((stat) => {
               const Icon = stat.icon;
               return (
