@@ -595,6 +595,7 @@ export default function DoctorDashboard() {
           isOpen={showChat}
           onClose={() => setShowChat(false)}
           chatId={selectedChatId}
+          appointmentId={selectedBooking.id}
           recipientName={selectedBooking.patientName}
           recipientRole="patient"
           recipientPhone={(selectedBooking as any).patientPhone}

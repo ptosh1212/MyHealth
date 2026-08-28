@@ -68,6 +68,7 @@ export default function PatientChats() {
           chatId={selectedChat.id}
           recipientName={selectedChat.doctorName}
           recipientRole="doctor"
+          appointmentId={selectedChat?.appointmentId}
         />
       )}
     </div>

@@ -65,7 +65,7 @@ export default function Navbar() {
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Chat link */}
           <Link
-            href={isDoctor ? '/doctor/dashboard' : '/patient/home'}
+            href={isDoctor ? '/doctor/dashboard' : '/patient/chats'}
             className="p-2 text-black hover:bg-gray-100 transition-colors relative"
           >
             <MessageSquare size={18} />

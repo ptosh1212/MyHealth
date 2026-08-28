@@ -76,6 +76,7 @@ export default function PatientHome() {
 
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [selectedChatId, setSelectedChatId] = useState('');
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState('');
 
   const hour = new Date().getHours();
 
@@ -194,16 +195,17 @@ export default function PatientHome() {
     setShowSuccess(true);
   };
 
-  const openChat = (booking: any) => {
-    setSelectedDoctor({
-      id: booking.doctorId,
-      name: booking.doctorName,
-      phone: booking.doctorPhone
-    });
+const openChat = (booking: any) => {
+  setSelectedDoctor({
+    id: booking.doctorId,
+    name: booking.doctorName,
+    phone: booking.doctorPhone
+  });
 
-    setSelectedChatId(`chat_${booking.id}`);
-    setIsChatOpen(true);
-  };
+  setSelectedAppointmentId(booking.id);
+  setSelectedChatId(`chat_${booking.id}`);
+  setIsChatOpen(true);
+};
 
   return (
     <div className="min-h-svh bg-slate-50 pb-28 lg:pb-8 text-slate-900">
@@ -643,18 +645,17 @@ export default function PatientHome() {
         />
       )}
 
-      {isChatOpen && selectedDoctor && (
-        <ChatPortal
-          isOpen={isChatOpen}
-          onClose={() =>
-            setIsChatOpen(false)
-          }
-          chatId={selectedChatId}
-          recipientName={selectedDoctor.name}
-          recipientRole="doctor"
-          doctorName={selectedDoctor.name}
-        />
-      )}
+{isChatOpen && selectedDoctor && (
+  <ChatPortal
+    isOpen={isChatOpen}
+    onClose={() => setIsChatOpen(false)}
+    chatId={selectedChatId}
+    appointmentId={selectedAppointmentId}
+    recipientName={selectedDoctor.name}
+    recipientRole="doctor"
+    doctorName={selectedDoctor.name}
+  />
+)}
 
       <SuccessPulse
         isOpen={showSuccess}

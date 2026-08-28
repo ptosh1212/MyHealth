@@ -454,6 +454,7 @@ export default function Appointments() {
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
           chatId={selectedChatId}
+          appointmentId={selectedAppointment.id}
           recipientName={selectedAppointment.doctorName}
           recipientRole="doctor"
         />

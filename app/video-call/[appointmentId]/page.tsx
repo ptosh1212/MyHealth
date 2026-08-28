@@ -18,22 +18,44 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
+/* =========================================================
+   BOOKING TYPE
+========================================================= */
 
 interface Booking {
   id: string;
+
   doctorId: string;
   userId: string;
-  status: string;
 
   doctorName?: string;
   patientName?: string;
 
-  appointmentDateStr?: string;
-  queueNumber?: number;
+  userPhone?: string;
 
-  roomId?: string;
+  status: string;
+
+  appointmentDateStr?: string;
+
+  symptoms?: string;
+  existingConditions?: string;
+
+  createdAt?: any;
+
+  [key: string]: any;
 }
 
+/* =========================================================
+   VIDEO APPOINTMENT TYPE
+========================================================= */
+
+interface VideoAppointment extends Booking {
+  roomId: string;
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
 
 export default function VideoCallPage() {
   const params = useParams();
@@ -41,15 +63,21 @@ export default function VideoCallPage() {
 
   const { user, userRole } = useAuthStore();
 
-  const appointmentId = params?.appointmentId as string;
+  const appointmentId =
+    typeof params?.appointmentId === 'string'
+      ? params.appointmentId
+      : '';
 
   const [loading, setLoading] = useState(true);
 
   const [appointment, setAppointment] =
-    useState<Booking | null>(null);
+    useState<VideoAppointment | null>(null);
 
   const [error, setError] = useState('');
 
+  /* =======================================================
+     LOAD APPOINTMENT
+  ======================================================= */
 
   useEffect(() => {
     if (!user?.uid || !appointmentId) {
@@ -58,107 +86,134 @@ export default function VideoCallPage() {
 
     const loadAppointment = async () => {
       try {
-        /*
-         * Get booking
-         */
+        setLoading(true);
+        setError('');
 
-        const bookingRef =
-          doc(db, 'bookings', appointmentId);
+        /* ---------------------------------------------------
+           1. GET BOOKING
+        --------------------------------------------------- */
+
+        const bookingRef = doc(
+          db,
+          'bookings',
+          appointmentId
+        );
 
         const bookingSnap =
           await getDoc(bookingRef);
-
 
         if (!bookingSnap.exists()) {
           setError('Appointment not found.');
           return;
         }
 
+        /* ---------------------------------------------------
+           2. CONVERT FIRESTORE DATA TO TYPED BOOKING
+        --------------------------------------------------- */
 
-        /*
-         * Explicitly tell TypeScript
-         * what fields exist in the booking.
-         */
-
-        const bookingData = bookingSnap.data();
+        const bookingData =
+          bookingSnap.data();
 
         const booking: Booking = {
           id: bookingSnap.id,
 
-          doctorId: bookingData.doctorId || '',
+          doctorId:
+            String(bookingData.doctorId || ''),
 
-          userId: bookingData.userId || '',
+          userId:
+            String(bookingData.userId || ''),
 
-          status: bookingData.status || '',
+          doctorName:
+            bookingData.doctorName || '',
 
-          doctorName: bookingData.doctorName,
+          patientName:
+            bookingData.patientName || '',
 
-          patientName: bookingData.patientName,
+          userPhone:
+            bookingData.userPhone || '',
+
+          status:
+            bookingData.status || '',
 
           appointmentDateStr:
-            bookingData.appointmentDateStr,
+            bookingData.appointmentDateStr || '',
 
-          queueNumber:
-            bookingData.queueNumber,
+          symptoms:
+            bookingData.symptoms || '',
+
+          existingConditions:
+            bookingData.existingConditions || '',
+
+          createdAt:
+            bookingData.createdAt,
+
+          ...bookingData,
         };
 
+        /* ---------------------------------------------------
+           3. MAKE SURE REQUIRED IDS EXIST
+        --------------------------------------------------- */
 
-        /*
-         * Check authorization
-         */
+        if (!booking.doctorId) {
+          setError(
+            'This appointment does not have a doctor assigned.'
+          );
+          return;
+        }
+
+        if (!booking.userId) {
+          setError(
+            'This appointment does not have a patient assigned.'
+          );
+          return;
+        }
+
+        /* ---------------------------------------------------
+           4. CHECK USER AUTHORIZATION
+        --------------------------------------------------- */
 
         const isDoctor =
           userRole === 'doctor' &&
           booking.doctorId === user.uid;
 
-
         const isPatient =
           userRole === 'patient' &&
           booking.userId === user.uid;
-
 
         if (!isDoctor && !isPatient) {
           setError(
             'You are not authorized to join this consultation.'
           );
-
           return;
         }
 
-
-        /*
-         * Only confirmed appointments
-         * can use video consultation.
-         */
+        /* ---------------------------------------------------
+           5. CHECK APPOINTMENT STATUS
+        --------------------------------------------------- */
 
         if (booking.status !== 'confirmed') {
           setError(
             'This appointment is not available for video consultation.'
           );
-
           return;
         }
 
-
-        /*
-         * One room per appointment
-         */
+        /* ---------------------------------------------------
+           6. CREATE ONE VIDEO ROOM PER APPOINTMENT
+        --------------------------------------------------- */
 
         const roomId =
           `appointment_${appointmentId}`;
 
-
         const roomRef =
           doc(db, 'videoCalls', roomId);
-
 
         const roomSnap =
           await getDoc(roomRef);
 
-
-        /*
-         * Doctor creates the room
-         */
+        /* ---------------------------------------------------
+           7. DOCTOR CREATES THE ROOM
+        --------------------------------------------------- */
 
         if (!roomSnap.exists() && isDoctor) {
           await setDoc(roomRef, {
@@ -166,44 +221,55 @@ export default function VideoCallPage() {
 
             appointmentId,
 
-            doctorId: booking.doctorId,
+            doctorId:
+              booking.doctorId,
 
-            patientId: booking.userId,
+            patientId:
+              booking.userId,
 
             status: 'waiting',
 
-            createdAt: Timestamp.now(),
+            createdAt:
+              Timestamp.now(),
 
-            updatedAt: Timestamp.now(),
+            updatedAt:
+              Timestamp.now(),
           });
         }
 
+        /* ---------------------------------------------------
+           8. PATIENT WAITS FOR ROOM
+        --------------------------------------------------- */
 
-        /*
-         * Save appointment locally
-         */
+        if (!roomSnap.exists() && isPatient) {
+          setError(
+            'The doctor has not started the consultation yet.'
+          );
+          return;
+        }
+
+        /* ---------------------------------------------------
+           9. SAVE APPOINTMENT
+        --------------------------------------------------- */
 
         setAppointment({
           ...booking,
-
           roomId,
         });
 
-      } catch (error) {
+      } catch (err) {
         console.error(
           'Video page error:',
-          error
+          err
         );
 
         setError(
           'Unable to load the consultation.'
         );
-
       } finally {
         setLoading(false);
       }
     };
-
 
     loadAppointment();
 
@@ -213,10 +279,9 @@ export default function VideoCallPage() {
     appointmentId,
   ]);
 
-
-  /*
-   * Loading screen
-   */
+  /* =======================================================
+     LOADING SCREEN
+  ======================================================= */
 
   if (loading) {
     return (
@@ -239,10 +304,9 @@ export default function VideoCallPage() {
     );
   }
 
-
-  /*
-   * Error screen
-   */
+  /* =======================================================
+     ERROR SCREEN
+  ======================================================= */
 
   if (error || !appointment) {
     return (
@@ -265,7 +329,7 @@ export default function VideoCallPage() {
 
           <button
             onClick={() => router.back()}
-            className="mt-6 px-5 py-3 rounded-xl bg-white/10 text-white text-sm hover:bg-white/15"
+            className="mt-6 px-5 py-3 rounded-xl bg-white/10 text-white text-sm hover:bg-white/15 transition"
           >
             Go Back
           </button>
@@ -276,25 +340,23 @@ export default function VideoCallPage() {
     );
   }
 
-
-  /*
-   * Determine role
-   */
+  /* =======================================================
+     DETERMINE VIDEO ROLE
+  ======================================================= */
 
   const role =
     userRole === 'doctor'
       ? 'doctor'
       : 'patient';
 
-
-  /*
-   * Start video consultation
-   */
+  /* =======================================================
+     VIDEO CALL
+  ======================================================= */
 
   return (
     <VideoCall
       appointmentId={appointment.id}
-      roomId={appointment.roomId!}
+      roomId={appointment.roomId}
       role={role}
       onEnd={() => router.back()}
     />
