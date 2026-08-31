@@ -12,6 +12,7 @@ const inter = Inter({
 });
 
 const SITE_URL = "https://my-health-fawn.vercel.app";
+const LINKEDIN_URL = "https://www.linkedin.com/in/zivanteai";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "Anant Prakash",
-      url: SITE_URL,
+      url: LINKEDIN_URL,
     },
   ],
 
@@ -181,8 +182,11 @@ export default function RootLayout({
 
         name: "Anant Prakash",
 
+        url: LINKEDIN_URL,
 
-        url: SITE_URL,
+        sameAs: [
+          LINKEDIN_URL
+        ],
 
         jobTitle: "Developer",
 
@@ -240,14 +244,14 @@ export default function RootLayout({
 
         {/* Lottie Player */}
         <script
-          src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
+          src="https://unpkg.com"
           defer
         />
 
         {/* Google Ads / gtag.js */}
         <script
           async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18021935082"
+          src="https://googletagmanager.com"
         />
 
         <script
