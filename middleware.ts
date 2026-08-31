@@ -27,5 +27,6 @@ export const config = {
     },
     '/patient/:path*',
     '/doctor/:path*',
+    '/founder/:path*',
   ],
 };
