@@ -63,7 +63,7 @@ export default function LoginPage() {
       if (doctorDoc.exists()) {
         const doctorData = doctorDoc.data();
         const verificationStatus = doctorData?.verificationStatus || (doctorData?.verified ? 'approved' : 'pending');
-        router.push(verificationStatus === 'pending' ? '/doctor/verification-pending' : '/doctor/dashboard');
+        router.push(verificationStatus === 'pending' ? '/doctor/verification-pending' : '/doctor/verification-pending');
         return;
       }
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
       if (role === 'admin') {
         router.push('/admin');
       } else if (role === 'doctor') {
-        router.push('/doctor/dashboard');
+        router.push('/doctor/verification-pending');
       } else {
         router.push('/patient/home');
       }

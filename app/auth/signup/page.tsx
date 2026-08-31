@@ -288,7 +288,7 @@ function SignupForm() {
           createdAt: Timestamp.now(),
         });
 
-        router.replace('/doctor/dashboard');
+        router.replace('/doctor/verification-pending');
       } else {
         await setDoc(doc(db, 'users', userId), {
           uid: userId,
@@ -704,7 +704,7 @@ function SignupForm() {
               {role === 'doctor' && (
                 <div className="border-l-2 pl-4 py-1" style={{ borderColor: stamp }}>
                   <p className="text-sm" style={{ color: inkMuted }}>
-                    Your account Is Made <strong style={{ color: ink }}>Yauyy</strong>. Letss Goo
+                    Your account will be verified in <strong style={{ color: ink }}>2-3</strong> Business Days.
                     
                   </p>
                 </div>

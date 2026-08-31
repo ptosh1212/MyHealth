@@ -1,60 +1,235 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '@/lib/store';
+import { auth, db } from '@/lib/firebase';
 
-export default function RouteGuard({ children }: { children: React.ReactNode }) {
+export default function RouteGuard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const { userRole, loading } = useAuthStore();
+
+  const { user, userRole, loading } = useAuthStore();
+
+  const [checkingDoctor, setCheckingDoctor] = useState(false);
 
   useEffect(() => {
-    // Don't check while loading
-    if (loading) return;
+    let cancelled = false;
 
-    // Public routes — no login required
-    const publicRoutes = ['/auth/', '/instabooking', '/terms'];
-    if (pathname === '/' || publicRoutes.some(r => pathname?.startsWith(r))) return;
+    const checkRoutes = async () => {
+      // Don't check while AuthProvider is loading
+      if (loading) return;
 
-    // If no role, redirect to login
-    if (!userRole) {
-      router.push('/auth/login');
-      return;
-    }
+      // Public routes — no login required
+      const publicRoutes = [
+        '/auth/',
+        '/instabooking',
+        '/terms',
+        '/founder',
+      ];
 
-    // Doctor trying to access patient/admin routes
-    if (userRole === 'doctor' && (pathname?.startsWith('/patient') || pathname?.startsWith('/admin'))) {
-      router.push('/doctor/dashboard');
-      return;
-    }
-
-    // Patient trying to access doctor/admin routes
-    if (userRole === 'patient' && (pathname?.startsWith('/doctor') || pathname?.startsWith('/admin'))) {
-      router.push('/patient/home');
-      return;
-    }
-
-    // Admin trying to access other routes (they can if they want, but usually stay in /admin)
-    if (userRole === 'admin' && !pathname?.startsWith('/admin') && !pathname?.startsWith('/auth/')) {
-        // Option: restricted to admin panel or allow all? Usually restricted to prevent UI bugs.
-        // Let's keep them in /admin for management.
+      if (
+        pathname === '/' ||
+        publicRoutes.some((route) => pathname?.startsWith(route))
+      ) {
         return;
-    }
+      }
 
-    // Non-admin trying to access admin routes
-    if (userRole !== 'admin' && pathname?.startsWith('/admin')) {
-      if (userRole === 'doctor') router.push('/doctor/dashboard');
-      else router.push('/patient/home');
-      return;
-    }
-  }, [userRole, pathname, loading, router]);
+      // No logged-in user / no role
+      if (!user || !userRole) {
+        router.replace('/auth/login');
+        return;
+      }
 
-  // Show loading while checking
-  if (loading) {
+      /*
+       * ============================================================
+       * DOCTOR ROUTE PROTECTION
+       * ============================================================
+       *
+       * Doctors are checked against:
+       * doctors/{uid}
+       *
+       * Pending doctors are ONLY allowed to access:
+       * /doctor/verification-pending
+       */
+      if (userRole === 'doctor') {
+        setCheckingDoctor(true);
+
+        try {
+          const doctorRef = doc(db, 'doctors', user.uid);
+          const doctorSnap = await getDoc(doctorRef);
+
+          if (cancelled) return;
+
+          // Doctor document doesn't exist
+          if (!doctorSnap.exists()) {
+            console.error(
+              'Doctor account found in auth/store but doctors document is missing.'
+            );
+
+            setCheckingDoctor(false);
+            router.replace('/auth/login');
+            return;
+          }
+
+          const doctorData = doctorSnap.data();
+
+          /*
+           * Support both:
+           *
+           * verificationStatus: "pending"
+           *
+           * and the older:
+           *
+           * verified: true / false
+           */
+          const verificationStatus =
+            doctorData?.verificationStatus ||
+            (doctorData?.verified ? 'approved' : 'pending');
+
+          /*
+           * PENDING DOCTOR
+           *
+           * They can ONLY access the verification-pending page.
+           */
+          if (verificationStatus === 'pending') {
+            setCheckingDoctor(false);
+
+            if (
+              pathname !== '/doctor/verification-pending'
+            ) {
+              router.replace('/doctor/verification-pending');
+            }
+
+            return;
+          }
+
+          /*
+           * APPROVED DOCTOR
+           *
+           * If an approved doctor visits the pending page,
+           * send them to their dashboard.
+           */
+          if (
+            verificationStatus !== 'pending' &&
+            pathname === '/doctor/verification-pending'
+          ) {
+            setCheckingDoctor(false);
+            router.replace('/doctor/dashboard');
+            return;
+          }
+
+          setCheckingDoctor(false);
+
+          /*
+           * Approved doctor trying to access patient/admin routes
+           */
+          if (
+            pathname?.startsWith('/patient') ||
+            pathname?.startsWith('/admin')
+          ) {
+            router.replace('/doctor/dashboard');
+            return;
+          }
+
+          return;
+        } catch (error) {
+          console.error(
+            'Error checking doctor verification:',
+            error
+          );
+
+          if (!cancelled) {
+            setCheckingDoctor(false);
+            router.replace('/auth/login');
+          }
+
+          return;
+        }
+      }
+
+      /*
+       * ============================================================
+       * PATIENT ROUTES
+       * ============================================================
+       *
+       * Patient logic remains unchanged.
+       */
+      if (userRole === 'patient') {
+        // Patient trying to access doctor/admin routes
+        if (
+          pathname?.startsWith('/doctor') ||
+          pathname?.startsWith('/admin')
+        ) {
+          router.replace('/patient/home');
+          return;
+        }
+
+        return;
+      }
+
+      /*
+       * ============================================================
+       * ADMIN ROUTES
+       * ============================================================
+       */
+
+      if (userRole === 'admin') {
+        // Admin can access everything.
+        return;
+      }
+
+      /*
+       * ============================================================
+       * FALLBACK
+       * ============================================================
+       */
+
+      if (
+        userRole !== 'admin' &&
+        pathname?.startsWith('/admin')
+      ) {
+        if (userRole === 'doctor') {
+          router.replace('/doctor/dashboard');
+        } else {
+          router.replace('/patient/home');
+        }
+
+        return;
+      }
+    };
+
+    checkRoutes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    user,
+    userRole,
+    pathname,
+    loading,
+    router,
+  ]);
+
+  /*
+   * Show loading while authentication is being checked.
+   */
+  if (loading || checkingDoctor) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0e0a] via-[#0F110B] to-[#1a1410]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary" />
+
+          <p className="text-sm text-gray-400">
+            Checking your account...
+          </p>
+        </div>
       </div>
     );
   }

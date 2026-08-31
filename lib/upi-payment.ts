@@ -18,9 +18,9 @@ interface PaymentResult {
 
 // Your UPI Details (Change these to your actual UPI details)
 const UPI_CONFIG = {
-  vpa: 'zeyphrahealth@paytm', // Change to your UPI ID
-  name: 'Zeyphra Health',
-  merchantCode: 'ZEYPHRA', // Optional merchant code
+  vpa: '', // Change to your UPI ID
+  name: 'My Health',
+  merchantCode: 'ANANT', // Optional merchant code
 };
 
 /**
