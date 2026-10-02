@@ -221,18 +221,44 @@ export default function RouteGuard({
    * Show loading while authentication is being checked.
    */
   if (loading || checkingDoctor) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0e0a] via-[#0F110B] to-[#1a1410]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary" />
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#FAF8F3]">
+      <div className="flex items-center justify-center">
+        <span
+          className="text-4xl font-semibold"
+          style={{
+            color: '#0A1F47',
+            animation: 'myHealthFade 1.8s ease-in-out infinite',
+          }}
+        >
+          My Health
+        </span>
 
-          <p className="text-sm text-gray-400">
-            Checking your account...
-          </p>
-        </div>
+        <style jsx>{`
+          @keyframes myHealthFade {
+            0% {
+              opacity: 0;
+              transform: translateY(12px);
+            }
+
+            25% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+
+            70% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+
+            100% {
+              opacity: 0;
+              transform: translateY(-6px);
+            }
+          }
+        `}</style>
       </div>
-    );
-  }
-
-  return <>{children}</>;
+    </div>
+  );
+}
 }
