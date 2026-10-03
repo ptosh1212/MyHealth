@@ -234,40 +234,40 @@ export default function RouteGuard({
       <div
         style={{
           color: '#0A1F47',
-          fontSize: '36px',
+          fontSize: '38px',
           fontWeight: 600,
-          animation: 'myHealthFade 1.8s ease-in-out infinite',
+          letterSpacing: '-0.02em',
+          animation: 'myHealthSplash 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
         }}
       >
         My Health
       </div>
 
       <style>{`
-        @keyframes myHealthFade {
+        @keyframes myHealthSplash {
           0% {
             opacity: 0;
-            transform: translateY(12px);
+            transform: translateY(18px) scale(0.97);
           }
 
-          25% {
+          30% {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
 
-          70% {
+          75% {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
 
           100% {
             opacity: 0;
-            transform: translateY(-6px);
+            transform: translateY(-10px) scale(1.01);
           }
         }
       `}</style>
     </div>
   );
 }
-
 return <>{children}</>;
 }
