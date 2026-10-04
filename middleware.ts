@@ -29,6 +29,6 @@ export const config = {
     '/doctor/:path*',
     '/founder/:path*',
     '/instabooking/:path*',
-    '/download/:path*',
+    '/download.html/:path*',
   ],
 };

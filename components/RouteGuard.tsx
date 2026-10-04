@@ -31,8 +31,7 @@ export default function RouteGuard({
         '/instabooking',
         '/terms',
         '/founder',
-        '/download',
-        '/download/apk',
+        '/download.html',
       ];
 
       if (
