@@ -34,6 +34,9 @@ export default function AuthProvider({
         const isPublicRoute =
           pathname?.startsWith('/instabooking') ||
           pathname?.startsWith('/terms') ||
+          pathname?.startsWith('/download') ||
+          pathname?.startsWith('/fownload/apk') ||
+          pathname?.startsWith('/founder') ||
           pathname?.includes('ADSCUST.html');
 
         // ---------------------------------------------------------

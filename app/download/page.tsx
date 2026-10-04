@@ -2,205 +2,246 @@
 
 import { useState } from 'react';
 
-const APK_URL =
-  'https://github.com/ptosh1212/MyHealth/releases/tag/MyHealth/app-release.1.apk';
-
 export default function DownloadPage() {
   const [downloading, setDownloading] = useState(false);
 
-  const handleDownload = () => {
-    setDownloading(true);
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
 
-    const link = document.createElement('a');
-    link.href = APK_URL;
-    link.download = 'anant-health.apk';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
+      const response = await fetch('/download/apk');
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (!response.ok) {
+        throw new Error('Failed to download APK');
+      }
 
-    setTimeout(() => {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'MyHealth.apk';
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert('Unable to download the app. Please try again.');
+    } finally {
       setDownloading(false);
-    }, 2500);
+    }
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7fbff] text-slate-900">
+    <main className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
       {/* Background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-blue-200/40 blur-3xl" />
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-300/30 blur-3xl" />
+        <div className="absolute -right-32 top-20 h-[28rem] w-[28rem] rounded-full bg-cyan-300/25 blur-3xl" />
+        <div className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-indigo-300/20 blur-3xl" />
 
-        <div className="absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-cyan-200/30 blur-3xl" />
-
-        <div className="absolute bottom-[-250px] left-1/2 h-[550px] w-[700px] -translate-x-1/2 rounded-full bg-indigo-100/40 blur-3xl" />
-
-        {/* subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.035]"
           style={{
             backgroundImage:
-              'linear-gradient(#2563eb 1px, transparent 1px), linear-gradient(90deg, #2563eb 1px, transparent 1px)',
+              'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)',
             backgroundSize: '42px 42px',
           }}
         />
-
-        {/* floating circles */}
-        <div className="absolute left-[12%] top-[25%] h-4 w-4 rounded-full bg-blue-400/20" />
-        <div className="absolute right-[16%] top-[35%] h-6 w-6 rounded-full bg-cyan-400/20" />
-        <div className="absolute left-[20%] bottom-[20%] h-7 w-7 rounded-full bg-indigo-400/10" />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10 lg:px-16">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-100 ring-1 ring-blue-100">
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+        <a href="/" className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
             <img
-              src="https://media.median.co/..."
+              src="/icon.png"
               alt="My Health"
               className="h-full w-full object-cover"
             />
           </div>
 
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-[#123c69]">
-              My Health
-            </h1>
-            <p className="text-xs text-slate-500">Healthcare, simplified.</p>
+            <div className="text-lg font-bold tracking-tight">My Health</div>
+            <div className="text-xs text-slate-500">
+              Healthcare, simplified.
+            </div>
           </div>
-        </div>
+        </a>
 
-        <div className="hidden rounded-full border border-blue-100 bg-white/70 px-4 py-2 text-sm font-medium text-[#123c69] shadow-sm backdrop-blur sm:block">
-          Your health. Your way.
-        </div>
+        <a
+          href="/"
+          className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"
+        >
+          Home
+        </a>
       </header>
 
-      {/* Hero */}
-      <section className="relative z-10 flex min-h-[calc(100vh-96px)] items-center justify-center px-6 pb-16 pt-8">
-        <div className="mx-auto w-full max-w-5xl text-center">
-          {/* App badge */}
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-4 py-2 text-sm font-medium text-[#1557a6] shadow-sm backdrop-blur">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-            My Health Android App
+      {/* Main */}
+      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-5xl items-center justify-center px-6 py-16">
+        <div className="w-full max-w-3xl text-center">
+          {/* Badge */}
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm backdrop-blur">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            Official My Health App
           </div>
 
           {/* Heading */}
-          <h2 className="mx-auto max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-[#123c69] sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="text-5xl font-black tracking-tight text-slate-950 sm:text-6xl md:text-7xl">
             Your healthcare,
             <br />
-            <span className="bg-gradient-to-r from-[#1557a6] via-[#1677c8] to-[#0891b2] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 bg-clip-text text-transparent">
               right in your pocket.
             </span>
-          </h2>
+          </h1>
 
-          {/* Description */}
           <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-            Access My Health wherever you go. Connect with doctors, manage
-            appointments, and stay connected to your healthcare from one simple
-            app.
+            Get the My Health Android app and connect with doctors, manage
+            consultations, and access your healthcare from anywhere.
           </p>
 
-          {/* Download card */}
-          <div className="mx-auto mt-10 max-w-md">
-            <div className="rounded-3xl border border-white/80 bg-white/80 p-3 shadow-2xl shadow-blue-100/70 backdrop-blur-xl">
+          {/* Download Card */}
+          <div className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-white/80 bg-white/80 p-5 shadow-2xl shadow-blue-900/10 backdrop-blur-xl sm:p-7">
+            <div className="flex flex-col items-center gap-5 sm:flex-row sm:text-left">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20">
+                {/* Android icon */}
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-8 w-8"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M17.523 15.341a.999.999 0 1 1-1.998 0 .999.999 0 0 1 1.998 0Zm-9.048 0a.999.999 0 1 1-1.998 0 .999.999 0 0 1 1.998 0ZM17.826 6.03l1.486-2.576a.5.5 0 1 0-.866-.5l-1.505 2.608A9.47 9.47 0 0 0 12 4.25a9.47 9.47 0 0 0-4.941 1.312L5.554 2.954a.5.5 0 1 0-.866.5L6.174 6.03A8.65 8.65 0 0 0 3.5 12.5h17a8.65 8.65 0 0 0-2.674-6.47ZM6.75 17.5h1.5v2a1.25 1.25 0 0 1-2.5 0v-2h1Zm9 0h1.5v2a1.25 1.25 0 0 1-2.5 0v-2h1ZM4 13.5h16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z" />
+                </svg>
+              </div>
+
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-slate-950">
+                  My Health for Android
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Download the latest Android version.
+                </p>
+              </div>
+
               <button
+                type="button"
                 onClick={handleDownload}
                 disabled={downloading}
-                className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-[#123c69] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-[#123c69]/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0e3156] hover:shadow-xl disabled:cursor-wait disabled:opacity-80"
+                className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <svg
-                  className={`h-5 w-5 ${
-                    downloading ? 'animate-bounce' : ''
-                  }`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M12 3v12" />
-                  <path d="m7 10 5 5 5-5" />
-                  <path d="M5 21h14" />
-                </svg>
-
-                {downloading ? 'Starting download...' : 'Download for Android'}
+                {downloading ? (
+                  <>
+                    <svg
+                      className="h-5 w-5 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        opacity="0.3"
+                      />
+                      <path
+                        d="M21 12a9 9 0 0 1-9 9"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    Downloading...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 3v12" />
+                      <path d="m7 10 5 5 5-5" />
+                      <path d="M5 21h14" />
+                    </svg>
+                    Download APK
+                  </>
+                )}
               </button>
             </div>
-
-            <p className="mt-4 text-xs text-slate-500">
-              APK • Android • Free download
-            </p>
           </div>
 
           {/* Features */}
-          <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
-            <Feature
-              icon="✓"
-              title="Simple"
-              description="Everything in one place"
-            />
-
-            <Feature
-              icon="⌁"
-              title="Connected"
-              description="Stay connected with doctors"
-            />
-
-            <Feature
-              icon="♡"
-              title="For you"
-              description="Healthcare from anywhere"
-            />
-          </div>
-
-          {/* Install note */}
-          <div className="mx-auto mt-12 max-w-lg rounded-2xl border border-blue-100 bg-white/60 px-5 py-4 text-left shadow-sm backdrop-blur">
-            <div className="flex gap-3">
-              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-[#1557a6]">
-                i
+          <div className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/80 bg-white/60 p-4 backdrop-blur">
+              <div className="text-sm font-bold text-slate-900">
+                Doctor Consultations
               </div>
+              <div className="mt-1 text-xs text-slate-500">
+                Connect with doctors
+              </div>
+            </div>
 
-              <div>
-                <p className="text-sm font-semibold text-slate-800">
-                  Installing the app
-                </p>
+            <div className="rounded-2xl border border-white/80 bg-white/60 p-4 backdrop-blur">
+              <div className="text-sm font-bold text-slate-900">
+                Secure
+              </div>
+              <div className="mt-1 text-xs text-slate-500">
+                Your healthcare data
+              </div>
+            </div>
 
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Download the APK, open it on your Android device, and allow
-                  installation when Android asks for permission.
-                </p>
+            <div className="rounded-2xl border border-white/80 bg-white/60 p-4 backdrop-blur">
+              <div className="text-sm font-bold text-slate-900">
+                Anywhere
+              </div>
+              <div className="mt-1 text-xs text-slate-500">
+                Healthcare on the go
               </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <p className="mt-14 text-xs text-slate-400">
+          {/* Install note */}
+          <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-blue-100 bg-blue-50/70 px-5 py-4 text-left">
+            <div className="flex gap-3">
+              <div className="mt-0.5 shrink-0 text-blue-600">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4" />
+                  <path d="M12 8h.01" />
+                </svg>
+              </div>
+
+              <p className="text-sm leading-6 text-blue-900">
+                <strong>Android installation:</strong> After downloading the
+                APK, open it and allow your browser to install apps if Android
+                asks for permission.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-8 text-xs text-slate-400">
             © {new Date().getFullYear()} My Health. All rights reserved.
           </p>
         </div>
       </section>
     </main>
-  );
-}
-
-function Feature({
-  icon,
-  title,
-  description,
-}: {
-  icon: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/80 bg-white/60 px-5 py-5 shadow-sm backdrop-blur transition-all hover:-translate-y-1 hover:bg-white/80">
-      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-[#1557a6]">
-        {icon}
-      </div>
-
-      <h3 className="mt-3 text-sm font-bold text-slate-800">{title}</h3>
-
-      <p className="mt-1 text-xs text-slate-500">{description}</p>
-    </div>
   );
 }

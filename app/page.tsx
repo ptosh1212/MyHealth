@@ -132,6 +132,7 @@ export default function LandingPage() {
 
           <div className="nav__actions">
             <Link href="/auth/login" onClick={goToLogin} className="btn btn--ghost nav__links">Log in</Link>
+          <Link href="/download" className="btn btn--primary nav__download">Download App</Link>
             
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -152,7 +153,7 @@ export default function LandingPage() {
           ))}
           <div className="mobile-menu__divider" />
           <Link href="/auth/login" onClick={goToLogin} className="mobile-menu__link mobile-menu__link--accent">Log in</Link>
-            <Link href="/download" className="btn btn--primary nav__download">Download App</Link>
+          <Link href="/download" className="btn btn--primary nav__download">Download App</Link>
           <a href="#pricing" onClick={() => setMenuOpen(false)} className="btn btn--primary mobile-menu__cta">Start free trial</a>
         </div>
       </nav>
@@ -212,6 +213,7 @@ export default function LandingPage() {
           </div>
           <div className="footer__links">
             <Link href="/auth/login" onClick={goToLogin} className="footer__link">Log in</Link>
+            <Link href="/download" className="btn btn--primary nav__download">Download App</Link>
             <Link href="/auth/signup" className="footer__link">Sign up</Link>
             <Link href="/terms" className="footer__link">Terms</Link>
           </div>
