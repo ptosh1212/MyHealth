@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -26,11 +27,9 @@ interface ChatPortalProps {
   isOpen: boolean;
   onClose: () => void;
 
-  // Chat information
   chatId: string;
   appointmentId: string;
 
-  // Recipient information
   recipientName: string;
   recipientRole: 'doctor' | 'patient';
   recipientPhone?: string;
@@ -48,7 +47,6 @@ export default function ChatPortal({
   doctorName,
 }: ChatPortalProps) {
   const router = useRouter();
-
   const { user } = useAuthStore();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -57,9 +55,6 @@ export default function ChatPortal({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  /*
-   * Subscribe to chat messages
-   */
   useEffect(() => {
     if (!isOpen || !chatId) {
       return;
@@ -78,26 +73,12 @@ export default function ChatPortal({
     };
   }, [isOpen, chatId]);
 
-  /*
-   * Scroll to bottom of chat
-   */
   const scrollToBottom = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop =
-        scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
 
-  /*
-   * VIDEO CALL
-   *
-   * Clicking the phone button redirects to:
-   *
-   * /video-call/[appointmentId]
-   *
-   * Example:
-   * /video-call/ABC123
-   */
   const handleVideoCall = () => {
     if (!appointmentId) {
       console.error(
@@ -116,9 +97,6 @@ export default function ChatPortal({
     router.push(`/video-call/${encodeURIComponent(appointmentId)}`);
   };
 
-  /*
-   * Send message
-   */
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
@@ -152,16 +130,12 @@ export default function ChatPortal({
     } catch (error) {
       console.error('[ChatPortal] Send error:', error);
 
-      // Restore message if sending failed
       setInputText(currentText);
     } finally {
       setLoading(false);
     }
   };
 
-  /*
-   * Don't render when closed
-   */
   if (!isOpen) {
     return null;
   }
@@ -178,11 +152,10 @@ export default function ChatPortal({
       {/* Chat Container */}
       <div className="relative w-full sm:max-w-2xl h-full sm:h-[85vh] bg-white rounded-t-2xl sm:rounded-md border-t border-gray-200 sm:border sm:border-gray-200 shadow-sm flex flex-col animate-slide-up overflow-hidden">
 
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
+        <div className="px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between border-b border-gray-100 bg-white z-20">
 
-        <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100 bg-white z-20">
-
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
 
             {/* Mobile back */}
             <button
@@ -196,7 +169,6 @@ export default function ChatPortal({
 
             {/* Avatar */}
             <div className="relative">
-
               <div className="w-11 h-11 rounded-md bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-200 font-semibold">
                 {recipientName
                   ? recipientName[0].toUpperCase()
@@ -204,18 +176,15 @@ export default function ChatPortal({
               </div>
 
               <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-teal-500 border-2 border-white" />
-
             </div>
 
             {/* Recipient */}
-            <div>
-
-              <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">
+            <div className="min-w-0">
+              <h3 className="text-[15px] font-semibold text-gray-900 leading-tight truncate">
                 {recipientName}
               </h3>
 
               <div className="flex items-center gap-1.5 mt-1">
-
                 <div className="px-1.5 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-[10px] font-medium text-teal-700 capitalize">
                   {recipientRole}
                 </div>
@@ -223,17 +192,15 @@ export default function ChatPortal({
                 <span className="text-[11px] font-medium text-gray-400">
                   Secure channel
                 </span>
-
               </div>
-
             </div>
-
           </div>
 
           {/* Header actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
 
             {/* VIDEO CALL BUTTON */}
+            {/* FIXED: visible on mobile and desktop */}
             <button
               type="button"
               onClick={handleVideoCall}
@@ -243,7 +210,8 @@ export default function ChatPortal({
                   ? 'Start video call'
                   : 'Appointment ID is missing'
               }
-              className="hidden sm:flex w-9 h-9 rounded-sm bg-gray-50 border border-gray-200 items-center justify-center text-gray-400 hover:text-teal-600 hover:border-teal-200 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex w-9 h-9 rounded-sm bg-gray-50 border border-gray-200 items-center justify-center text-gray-400 hover:text-teal-600 hover:border-teal-200 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Start video call"
             >
               <Phone size={16} />
             </button>
@@ -259,20 +227,15 @@ export default function ChatPortal({
             </button>
 
           </div>
-
         </div>
 
-        {/* ================= MESSAGE THREAD ================= */}
-
+        {/* MESSAGE THREAD */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar pb-12 bg-white relative z-10"
+          className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar pb-12 bg-white relative z-10"
         >
-
           {messages.length === 0 ? (
-
-            <div className="py-32 flex flex-col items-center text-center px-12">
-
+            <div className="py-32 flex flex-col items-center text-center px-8 sm:px-12">
               <div className="w-16 h-16 rounded-md bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-300 mb-6">
                 <MessageCircle size={28} />
               </div>
@@ -288,45 +251,34 @@ export default function ChatPortal({
                     : recipientName}
                 </span>
               </h4>
-
             </div>
-
           ) : (
-
             messages.map((msg) => {
+              const isMe = msg.senderId === user?.uid;
 
-              const isMe =
-                msg.senderId === user?.uid;
-
-              const timestamp =
-                msg.createdAt?.seconds
-                  ? new Date(
-                      msg.createdAt.seconds * 1000
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '';
+              const timestamp = msg.createdAt?.seconds
+                ? new Date(
+                    msg.createdAt.seconds * 1000
+                  ).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '';
 
               return (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${
-                    isMe
-                      ? 'items-end'
-                      : 'items-start'
+                    isMe ? 'items-end' : 'items-start'
                   } group`}
                 >
-
                   {/* Sender */}
                   <div className="flex items-center gap-2 mb-1.5">
-
                     {!isMe && (
                       <span className="text-[11px] font-medium text-gray-400">
                         {msg.senderName}
                       </span>
                     )}
-
                   </div>
 
                   {/* Message */}
@@ -342,7 +294,6 @@ export default function ChatPortal({
 
                   {/* Time */}
                   <div className="flex items-center gap-2 mt-2 px-1">
-
                     <span className="text-[11px] font-medium text-gray-400 tabular-nums">
                       {timestamp}
                     </span>
@@ -353,35 +304,26 @@ export default function ChatPortal({
                         className="text-teal-500"
                       />
                     )}
-
                   </div>
-
                 </div>
               );
             })
           )}
-
         </div>
 
-        {/* ================= INPUT ================= */}
-
-        <div className="p-6 bg-white border-t border-gray-100 z-30">
+        {/* INPUT */}
+        <div className="p-4 sm:p-6 bg-white border-t border-gray-100 z-30">
 
           <form
             onSubmit={handleSend}
             className="flex items-end gap-3 max-w-4xl mx-auto"
           >
-
             <div className="flex-1 relative">
-
               <textarea
                 rows={1}
                 value={inputText}
-                onChange={(e) =>
-                  setInputText(e.target.value)
-                }
+                onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => {
-
                   if (
                     e.key === 'Enter' &&
                     !e.shiftKey
@@ -389,7 +331,6 @@ export default function ChatPortal({
                     e.preventDefault();
                     handleSend();
                   }
-
                 }}
                 placeholder="Write a message..."
                 className="w-full min-h-[52px] max-h-[150px] bg-gray-50 border border-gray-200 rounded-md pl-5 pr-12 py-3.5 text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white transition-all resize-none overflow-hidden"
@@ -402,40 +343,28 @@ export default function ChatPortal({
               >
                 <Smile size={18} />
               </button>
-
             </div>
 
             {/* Send */}
             <button
               type="submit"
-              disabled={
-                loading ||
-                !inputText.trim()
-              }
+              disabled={loading || !inputText.trim()}
               className="w-12 h-12 rounded-md bg-teal-600 hover:bg-teal-700 flex items-center justify-center text-white transition-all disabled:opacity-30 disabled:bg-gray-300 flex-shrink-0"
               aria-label="Send message"
             >
-
               {loading ? (
-
                 <div className="w-5 h-5 border-2 border-white border-t-transparent animate-spin rounded-full" />
-
               ) : (
-
                 <Send
                   size={19}
                   strokeWidth={2.5}
                 />
-
               )}
-
             </button>
-
           </form>
 
           {/* Bottom actions */}
           <div className="flex items-center justify-center gap-6 mt-4 text-gray-400">
-
             <button
               type="button"
               className="flex items-center gap-1.5 text-[11px] font-medium hover:text-gray-600 transition"
@@ -453,11 +382,8 @@ export default function ChatPortal({
               <Clock size={12} />
               Scheduled
             </button>
-
           </div>
-
         </div>
-
       </div>
 
       {/* Scrollbar */}
@@ -475,7 +401,7 @@ export default function ChatPortal({
           border-radius: 10px;
         }
       `}</style>
-
     </div>
   );
 }
+
