@@ -152,11 +152,7 @@ export default function LandingPage() {
           ))}
           <div className="mobile-menu__divider" />
           <Link href="/auth/login" onClick={goToLogin} className="mobile-menu__link mobile-menu__link--accent">Log in</Link>
-            <Link
-    href="/download"
-    className="btn btn--primary nav__download"
-  >
-    Download App</Link>
+            <Link href="/download" className="btn btn--primary nav__download">Download App</Link>
           <a href="#pricing" onClick={() => setMenuOpen(false)} className="btn btn--primary mobile-menu__cta">Start free trial</a>
         </div>
       </nav>
@@ -167,7 +163,7 @@ export default function LandingPage() {
           <div className="hero__copy">
             <div className="eyebrow">MY HEALTH</div>
             <h1 className="hero__headline">
-              Connect With DOctors & Patients.
+              Connect With Doctors & Patients.
             </h1>
             <p className="hero__sub">
               My Health is a project that is used for conversation btween doctors n patients

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 const APK_URL =
-  'https://github.com/ptosh1212/MyHealth/releases/download/MyHealth/anant-health.apk';
+  'https://github.com/ptosh1212/MyHealth/releases/download/MyHealth/app-release.1.apk';
 
 export default function DownloadPage() {
   const [downloading, setDownloading] = useState(false);
