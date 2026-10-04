@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Download My Health</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .download-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 20% 20%,
+          rgba(37, 99, 235, 0.16),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at 80% 80%,
+          rgba(6, 182, 212, 0.15),
+          transparent 35%
+        ),
+        #f7fbff;
+    }
+
+    .glow {
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .glow-1 {
+      background: #60a5fa;
+      top: -160px;
+      left: -130px;
+    }
+
+    .glow-2 {
+      background: #22d3ee;
+      bottom: -160px;
+      right: -130px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 500px;
+      padding: 55px 35px;
+      text-align: center;
+
+      background: rgba(255, 255, 255, 0.9);
+
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 28px;
+
+      box-shadow:
+        0 25px 70px rgba(15, 23, 42, 0.12);
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo img {
+      width: 82px;
+      height: 82px;
+
+      object-fit: cover;
+
+      border-radius: 22px;
+
+      margin-bottom: 22px;
+
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      margin: 0;
+
+      font-size: 42px;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -1px;
+
+      color: #0f172a;
+    }
+
+    .description {
+      margin: 16px 0 30px;
+
+      color: #64748b;
+
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .download-btn {
+      display: block;
+      width: 100%;
+
+      padding: 16px 22px;
+
+      border: none;
+      border-radius: 14px;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      text-decoration: none;
+      text-align: center;
+
+      color: #ffffff;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #0891b2
+        );
+
+      cursor: pointer;
+
+      box-shadow:
+        0 12px 30px rgba(37, 99, 235, 0.25);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 16px 35px rgba(37, 99, 235, 0.32);
+    }
+
+    .download-btn:active {
+      transform: translateY(0);
+    }
+
+    .note {
+      margin-top: 18px;
+
+      color: #94a3b8;
+
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 500px) {
+      .download-page {
+        padding: 18px;
+      }
+
+      .card {
+        padding: 40px 24px;
+        border-radius: 24px;
+      }
+
+      .logo img {
+        width: 72px;
+        height: 72px;
+        border-radius: 19px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .description {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="download-page">
+
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="card">
+
+      <div class="logo">
+        <img
+          src="/icon.png"
+          alt="My Health"
+        />
+      </div>
+
+      <h1>My Health</h1>
+
+      <p class="description">
+        Your healthcare, right in your pocket.
+        <br />
+        Download the My Health Android app.
+      </p>
+
+      <a
+        href="/my-health.apk"
+        download="My-Health.apk"
+        class="download-btn"
+      >
+        Download Android App
+      </a>
+
+      <p class="note">
+        The APK download will start automatically.
+      </p>
+
+    </div>
+
+  </main>
+
+</body>
+</html>
