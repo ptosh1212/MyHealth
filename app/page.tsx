@@ -36,7 +36,7 @@ const FEATURES = [
   {
     label: 'Overview',
     title: 'One dashboard for the day',
-    desc: 'Today\u2019s walk-ins and bookings, at a glance, updated in real time as patients move through.',
+    desc: 'Today walk-ins and bookings, at a glance, updated in real time as patients move through.',
   },
 ];
 
@@ -152,6 +152,11 @@ export default function LandingPage() {
           ))}
           <div className="mobile-menu__divider" />
           <Link href="/auth/login" onClick={goToLogin} className="mobile-menu__link mobile-menu__link--accent">Log in</Link>
+            <Link
+    href="/download"
+    className="btn btn--primary nav__download"
+  >
+    Download App</Link>
           <a href="#pricing" onClick={() => setMenuOpen(false)} className="btn btn--primary mobile-menu__cta">Start free trial</a>
         </div>
       </nav>
