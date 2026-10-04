@@ -2,33 +2,41 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // This is a basic middleware - you'll need to implement proper auth checking
-  // For now, it just allows all requests
+  // Currently allows all matched requests.
+  // Add authentication/authorization here later.
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - ADSCUST.html (specifically the ad landing page)
-     * - any other files in public/ with extensions
+     * Match all routes except:
+     * - API routes
+     * - Next.js static/image files
+     * - favicon
+     * - HTML files in /public
+     * - common image files in /public
      */
     {
-      source: '/((?!api|_next/static|_next/image|favicon.ico|.*\\.html$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$).*)',
+      source:
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.html$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$).*)',
       missing: [
-        { type: 'header', key: 'next-router-prefetch' },
-        { type: 'header', key: 'purpose', value: 'prefetch' },
+        {
+          type: 'header',
+          key: 'next-router-prefetch',
+        },
+        {
+          type: 'header',
+          key: 'purpose',
+          value: 'prefetch',
+        },
       ],
     },
+
+    // Explicitly include protected application areas
     '/patient/:path*',
     '/doctor/:path*',
     '/founder/:path*',
     '/instabooking/:path*',
-    '/download.html/:path*',
   ],
 };
