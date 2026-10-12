@@ -1,6 +1,5 @@
 # My Health
 
-![Hackatime Stats](https://github-readme-stats.hackclub.dev/api/wakatime?username=55530\&api_domain=hackatime.hackclub.com\&theme=darcula\&custom_title=Hackatime+Stats\&layout=compact\&cache_seconds=0\&langs_count=8)
 
 This is a health website which I made for patients and doctors as i suffer frm Seizure Attacks. The main idea is to make it easier for patients to find doctors, book appointments and manage their medicines.
 
@@ -46,7 +45,7 @@ This project is still not fully complete and some things may not work properly.
 
 You need:
 
-* Node.js 18 or higher
+* Node.js 18 or higher ( I have use 22.2)
 * Firebase project
 * VAPID key for push notifications
 
@@ -191,8 +190,6 @@ This makes testing both roles easier.
 
 ---
 
-I made this project for Hack Club and I am still working on improving it.
-
 Thanks for checking my project.
 
-**Anant**
+**Anant  Prakash**
