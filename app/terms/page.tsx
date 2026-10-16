@@ -130,9 +130,14 @@ export default function TermsPage() {
                 <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-10">
                   <a href="mailto:anantprakash1029@gmail.com" className="flex flex-col items-center gap-1 group">
                     <Mail size={24} className="text-gray-300 group-hover:text-[#1D9E75] transition-colors mb-2" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Electronic</span>
                     <span className="font-bold text-sm text-black underline decoration-gray-200 underline-offset-4">anantprakash1029@gmail.com</span>
                   </a>
+                  <a
+      href="https://www.linkedin.com/in/zivanteai/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline"
+    ></a>
                   <a href="tel:8538900011" className="flex flex-col items-center gap-1 group">
                     <Phone size={24} className="text-gray-300 group-hover:text-[#1D9E75] transition-colors mb-2" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Direct</span>

@@ -5,6 +5,14 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
 import DoctorSidebar from '@/components/DoctorSidebar';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Doctor Dashboard | My Health',
+  description: 'My Health doctor dashboard for managing patient records and appointments.',
+};
+
+
 export default function DoctorLayout({
   children,
 }: {
