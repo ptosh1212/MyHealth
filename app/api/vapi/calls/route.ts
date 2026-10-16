@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { vapiGet } from '@/lib/vapi-server';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
