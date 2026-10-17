@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Shield, CreditCard, XCircle, Scale, Mail, Phone, MapPin, Check, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | MyHealth Health',
-  description: 'MyHealth Health Terms of Service and Privacy Policy.',
+  title: 'Terms & Conditions | MyHealth',
+  description: 'MyHealth  Terms of Service and Privacy Policy.',
 };
 
 export default function TermsPage() {
@@ -132,17 +132,21 @@ export default function TermsPage() {
                     <Mail size={24} className="text-gray-300 group-hover:text-[#1D9E75] transition-colors mb-2" />
                     <span className="font-bold text-sm text-black underline decoration-gray-200 underline-offset-4">anantprakash1029@gmail.com</span>
                   </a>
-                  <a
 
-  href="https://www.linkedin.com/in/zivanteai/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="underline hover:text-blue-300 transition-colors"
->
-  LinkedIn
-</a>
+  <a
+    href="https://www.linkedin.com/in/zivanteai/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex flex-col items-center gap-1 group"
+  >
+    <span className="font-bold text-sm text-black underline decoration-gray-200 underline-offset-4 group-hover:text-[#1D9E75] transition-colors">
+      https://www.linkedin.com/in/zivanteai/
+    </span>
+  </a>
 
-                  <a href="tel:8538900011" className="flex flex-col items-center gap-1 group">
+
+
+                  <a href="tel:7903191345 " className="flex flex-col items-center gap-1 group">
                     <Phone size={24} className="text-gray-300 group-hover:text-[#1D9E75] transition-colors mb-2" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Direct</span>
                     <span className="font-bold text-sm text-black underline decoration-gray-200 underline-offset-4">7903191345</span>
