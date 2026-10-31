@@ -404,7 +404,7 @@ export default function PatientProfile() {
         </div>
 
         <div className="flex items-center justify-center pt-6">
-          <p className="text-[11px] text-slate-400">MyHealth patient profile</p>
+          <p className="text-[11px] text-slate-400">My Health Patient Profile</p>
         </div>
 
       </div>

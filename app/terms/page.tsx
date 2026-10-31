@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Shield, CreditCard, XCircle, Scale, Mail, Phone, MapPin, Check, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | MyHealth',
+  title: 'Terms & Conditions',
   description: 'MyHealth  Terms of Service and Privacy Policy.',
 };
 

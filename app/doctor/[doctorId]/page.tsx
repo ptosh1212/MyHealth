@@ -34,10 +34,10 @@ interface DoctorData {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   // Return basic metadata - will be enhanced at runtime
   return {
-    title: 'Doctor Profile | My Health',
+    title: 'Doctor Profile',
     description: 'Book appointment with experienced doctors online. View doctor profile, ratings, and availability.',
     openGraph: {
-      title: 'Doctor Profile | My Health',
+      title: 'Doctor Profile',
       description: 'Book appointment with experienced doctors online.',
       type: 'profile',
       siteName: 'My Health',

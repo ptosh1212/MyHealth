@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     title: "My Health — Anant Prakash",
 
     description:
-      "My Health is a healthcare platform created and developed by Anant Prakash), connecting doctors and patients through a simple digital clinic system.",
+      "My Health is a healthcare platform created and developed by Anant Prakash, connecting doctors and patients through a simple digital clinic system.",
 
     images: [
       {

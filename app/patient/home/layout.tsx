@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Patient Home | My Health',
+  title: 'Patient Home',
   description: 'My Health patient home page.',
 };
 

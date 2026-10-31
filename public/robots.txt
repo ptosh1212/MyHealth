@@ -1,14 +1,35 @@
-# Allow all search engines
+# General search engines, including Google Search
 User-agent: *
 Allow: /
+Allow: /founder
+Allow: /terms
+Allow: /instabookings/
+Allow: auth/login
 
-# Disallow admin and private pages
-    
-
-# Allow public pages
+# ChatGPT Search
+User-agent: OAI-SearchBot
 Allow: /
-Allow: /auth/
-Allow: /instabooking/
+Allow: /founder
+Allow: /terms
+Allow: /instabookings/
+Allow: auth/login
+
+# Google Search
+User-agent: Googlebot
+Allow: /
+Allow: /founder
+Allow: /terms
+Allow: /instabookings/
+Allow: auth/login
+
+# Gemini training and grounding preferences
+User-agent: Google-Extended
+Allow: /
+Allow: /founder
+Allow: /terms
+Allow: /instabookings/
+Allow: auth/login
+
 
 # Sitemap
 Sitemap: https://my-health-fawn.vercel.app/sitemap.xml

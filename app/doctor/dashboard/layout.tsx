@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Doctor Dashboard | My Health',
+  title: 'Doctor Dashboard',
   description: 'My Health doctor dashboard for managing patient records and appointments.',
 };
 
