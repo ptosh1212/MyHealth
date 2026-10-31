@@ -269,8 +269,14 @@ export default function VideoCall({
         };
 
         peer.onicecandidateerror = (event) => {
-          console.error('[WebRTC] ICE candidate error:', event);
-        };
+  console.error("[WebRTC] ICE candidate error details:", {
+    errorCode: event.errorCode,
+    errorText: event.errorText,
+    url: event.url,
+    address: event.address,
+    port: event.port,
+  });
+};
 
         peer.oniceconnectionstatechange = () => {
           console.log('[WebRTC] ICE state:', peer.iceConnectionState);
