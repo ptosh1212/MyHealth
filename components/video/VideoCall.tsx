@@ -252,11 +252,16 @@ export default function VideoCall({
           }
         };
 
+        const candidateCollection =
+          role === 'doctor' ? 'callerCandidates' : 'calleeCandidates';
+
         peer.onicecandidate = async (event) => {
           if (!event.candidate || disposed) return;
 
-          const candidateCollection =
-            role === 'doctor' ? 'callerCandidates' : 'calleeCandidates';
+          console.log('[ICE Candidate]', {
+            type: event.candidate.type,
+            protocol: event.candidate.protocol,
+          });
 
           try {
             await addDoc(collection(roomRef, candidateCollection), {
