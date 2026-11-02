@@ -1,26 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const INTERAKT_API_KEY = 'cGVySWZtYXcwMUIzbl9HVEJ3WHFwMzUyVThJYXc3UjlfcXFDR0hkX19TSTo=';
-const INTERAKT_API_URL = 'https://api.interakt.ai/v1/public/message/';
+// Point this to your new local background server running on PM2
+const LOCAL_WHATSAPP_API_URL =  'https://bonus-legroom-emblem.ngrok-free.dev/api/send';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const response = await fetch(INTERAKT_API_URL, {
+    const response = await fetch(LOCAL_WHATSAPP_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${INTERAKT_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      // Forwarding the exact format your local server expects
+      body: JSON.stringify({
+        number: body.number, 
+        message: body.message
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Interakt API error:', data);
-      return NextResponse.json({ error: 'Interakt API error', details: data }, { status: response.status });
+      console.error('Local WhatsApp API error:', data);
+      return NextResponse.json({ error: 'Local WhatsApp error', details: data }, { status: response.status });
     }
 
     return NextResponse.json(data);

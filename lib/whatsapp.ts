@@ -1,22 +1,16 @@
-// Interakt WhatsApp API Integration — routed via /api/whatsapp to avoid CORS
+// lib/whatsapp.ts
 
 interface WhatsAppMessage {
-  countryCode: string;
-  phoneNumber: string;
-  type: 'Template';
-  template: {
-    name: string;
-    languageCode: string;
-    bodyValues?: string[];
-  };
+  number: string;
+  message: string;
 }
 
-async function sendWhatsAppMessage(message: WhatsAppMessage) {
+async function sendWhatsAppMessage({ number, message }: WhatsAppMessage) {
   try {
     const response = await fetch('/api/whatsapp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message),
+      body: JSON.stringify({ number, message }),
     });
 
     if (!response.ok) {
@@ -31,20 +25,20 @@ async function sendWhatsAppMessage(message: WhatsAppMessage) {
   }
 }
 
-// Extract phone number and country code
-function parsePhoneNumber(phone: string): { countryCode: string; phoneNumber: string } {
+// Extract and format phone number for whatsapp-web.js (No '+' sign)
+function formatPhoneNumber(phone: string): string {
   const cleaned = phone.replace(/\D/g, '');
 
+  // If already has 91 country code
   if (cleaned.startsWith('91') && cleaned.length === 12) {
-    return { countryCode: '+91', phoneNumber: cleaned.substring(2) };
+    return cleaned;
   }
+  // If standard 10-digit Indian number, append 91
   if (cleaned.length === 10) {
-    return { countryCode: '+91', phoneNumber: cleaned };
+    return '91' + cleaned;
   }
-  return {
-    countryCode: '+' + cleaned.substring(0, 2),
-    phoneNumber: cleaned.substring(2),
-  };
+  // Fallback for other countries
+  return cleaned;
 }
 
 // 1. Appointment Booked — Send to both patient and doctor
@@ -56,31 +50,19 @@ export async function notifyAppointmentBooked(
   appointmentDate: string,
   appointmentTime: string
 ) {
-  const patientPhoneParsed = parsePhoneNumber(patientPhone);
-  const doctorPhoneParsed = parsePhoneNumber(doctorPhone);
+  const pPhone = formatPhoneNumber(patientPhone);
+  const dPhone = formatPhoneNumber(doctorPhone);
 
   // Send to patient
   await sendWhatsAppMessage({
-    countryCode: patientPhoneParsed.countryCode,
-    phoneNumber: patientPhoneParsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'appointment_booked_patient',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, appointmentDate, appointmentTime],
-    },
+    number: pPhone,
+    message: `Hello ${patientName}, your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} has been successfully booked.`,
   });
 
   // Send to doctor
   await sendWhatsAppMessage({
-    countryCode: doctorPhoneParsed.countryCode,
-    phoneNumber: doctorPhoneParsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'appointment_booked_doctor',
-      languageCode: 'en',
-      bodyValues: [doctorName, patientName, appointmentDate, appointmentTime],
-    },
+    number: dPhone,
+    message: `New Appointment: Dr. ${doctorName}, you have a new booking with ${patientName} on ${appointmentDate} at ${appointmentTime}.`,
   });
 }
 
@@ -92,17 +74,9 @@ export async function notifyAppointmentConfirmed(
   appointmentDate: string,
   appointmentTime: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'appointment_confirmed',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, appointmentDate, appointmentTime],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} has been CONFIRMED.`,
   });
 }
 
@@ -113,17 +87,9 @@ export async function notifyAppointmentCancelled(
   doctorName: string,
   appointmentDate: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'appointment_cancelled',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, appointmentDate],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, please note that your appointment with Dr. ${doctorName} on ${appointmentDate} has been cancelled.`,
   });
 }
 
@@ -133,17 +99,9 @@ export async function notifyPrescriptionReady(
   patientName: string,
   doctorName: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'prescription_ready',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, your prescription from Dr. ${doctorName} is now ready. Please check your My Health portal to view it.`,
   });
 }
 
@@ -155,17 +113,9 @@ export async function notifyAppointmentReminder(
   appointmentDate: string,
   appointmentTime: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'appointment_reminder',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, appointmentDate, appointmentTime],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Reminder: Hello ${patientName}, you have an appointment with Dr. ${doctorName} tomorrow, ${appointmentDate} at ${appointmentTime}.`,
   });
 }
 
@@ -177,17 +127,9 @@ export async function notifyFollowUp(
   callbackDate: string,
   reason: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'follow_up',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, callbackDate, reason],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, Dr. ${doctorName} has requested a follow-up on ${callbackDate}. Reason: ${reason}.`,
   });
 }
 
@@ -197,17 +139,9 @@ export async function notifyVisitComplete(
   patientName: string,
   doctorName: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'visit_complete',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, thank you for your visit with Dr. ${doctorName}. We wish you good health!`,
   });
 }
 
@@ -217,17 +151,10 @@ export async function notifyWelcome(
   name: string,
   role: 'patient' | 'doctor'
 ) {
-  const parsed = parsePhoneNumber(phone);
-
+  const roleName = role === 'doctor' ? `Dr. ${name}` : name;
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: role === 'doctor' ? 'welcome_doctor' : 'welcome_patient',
-      languageCode: 'en',
-      bodyValues: [name],
-    },
+    number: formatPhoneNumber(phone),
+    message: `Welcome to My Health, ${roleName}! We are glad to have you on board.`,
   });
 }
 
@@ -238,16 +165,10 @@ export async function notifyNewMessage(
   doctorName: string,
   messagePreview: string
 ) {
-  const parsed = parsePhoneNumber(patientPhone);
-
+  const snippet = messagePreview.substring(0, 50) + (messagePreview.length > 50 ? '...' : '');
+  
   await sendWhatsAppMessage({
-    countryCode: parsed.countryCode,
-    phoneNumber: parsed.phoneNumber,
-    type: 'Template',
-    template: {
-      name: 'new_chat_message',
-      languageCode: 'en',
-      bodyValues: [patientName, doctorName, messagePreview.substring(0, 50) + (messagePreview.length > 50 ? '...' : '')],
-    },
+    number: formatPhoneNumber(patientPhone),
+    message: `Hello ${patientName}, you have a new message from Dr. ${doctorName}:\n\n"${snippet}"\n\nPlease log in to reply.`,
   }).catch(e => console.error('WhatsApp notifyNewMessage failed:', e));
 }
