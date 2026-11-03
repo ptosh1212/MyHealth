@@ -125,8 +125,9 @@ export default function VideoCall({
         if (!candidate) continue;
         try {
           await peer.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log('✅ [WebRTC] Flushed pending ICE candidate from queue');
         } catch (err) {
-          console.error('Failed to add queued ICE candidate:', err);
+          console.error('❌ [WebRTC] Failed to add queued ICE candidate:', err);
         }
       }
     };
@@ -136,13 +137,15 @@ export default function VideoCall({
       candidateData: RTCIceCandidateInit,
     ) => {
       if (!remoteDescriptionReady || !peer.remoteDescription) {
+        console.log('⏳ [WebRTC] Remote description not ready, queuing ICE candidate');
         pendingCandidates.push(candidateData);
         return;
       }
       try {
         await peer.addIceCandidate(new RTCIceCandidate(candidateData));
+        console.log('✅ [WebRTC] Added remote ICE candidate instantly');
       } catch (err) {
-        console.error('Failed to add remote ICE candidate:', err);
+        console.error('❌ [WebRTC] Failed to add remote ICE candidate:', err);
       }
     };
 
@@ -221,19 +224,25 @@ export default function VideoCall({
         const candidateCollection = role === 'doctor' ? 'callerCandidates' : 'calleeCandidates';
 
         peer.onicecandidate = async (event) => {
-          if (!event.candidate || disposed) return;
+          if (!event.candidate) {
+            console.log(`🧊 [WebRTC - ${role}] ICE Gathering Complete (null candidate).`);
+            return;
+          }
+          if (disposed) return;
+          
+          console.log(`📡 [WebRTC - ${role}] Gathered new ICE candidate. Attempting to save to Firebase:`, candidateCollection);
+          
           try {
             await addDoc(collection(roomRef, candidateCollection), {
               ...event.candidate.toJSON(),
               createdAt: Timestamp.now(),
             });
+            console.log(`✅ [WebRTC - ${role}] Successfully saved candidate to Firebase:`, candidateCollection);
           } catch (err) {
-            console.error('Failed to save local ICE candidate:', err);
+            console.error(`❌ [WebRTC - ${role}] Firebase write failed for ICE candidate. Check security rules!`, err);
           }
         };
 
-        // --- BUG FIX: STUCK ON WAITING ---
-        // We removed the 'checking' state flip. We only flip to waiting if they actually disconnect.
         const handleConnected = () => {
           if (peer.iceConnectionState === 'connected' || peer.iceConnectionState === 'completed' || peer.connectionState === 'connected') {
             setStatus('connected');
@@ -241,6 +250,7 @@ export default function VideoCall({
         };
 
         peer.oniceconnectionstatechange = () => {
+          console.log(`[WebRTC] ICE Connection State:`, peer.iceConnectionState);
           if (peer.iceConnectionState === 'failed') {
             setStatus('error');
             setError('Could not establish a media connection. Network issue.');
@@ -252,6 +262,7 @@ export default function VideoCall({
         };
 
         peer.onconnectionstatechange = () => {
+          console.log(`[WebRTC] Peer Connection State:`, peer.connectionState);
           if (peer.connectionState === 'failed') {
             setStatus('error');
             setError('Video connection failed. Check network connectivity.');
@@ -261,7 +272,6 @@ export default function VideoCall({
             handleConnected();
           }
         };
-        // ----------------------------------
 
         const remoteCandidateCollection = role === 'doctor' ? 'calleeCandidates' : 'callerCandidates';
 
@@ -273,6 +283,7 @@ export default function VideoCall({
               if (processedCandidateIds.has(change.doc.id)) continue;
               processedCandidateIds.add(change.doc.id);
               const { createdAt: _createdAt, ...candidateData } = change.doc.data();
+              console.log(`📥 [WebRTC - ${role}] Downloaded remote ICE candidate from Firebase`);
               void receiveCandidate(peer, candidateData as RTCIceCandidateInit);
             }
           }
@@ -295,13 +306,15 @@ export default function VideoCall({
 
           try {
             if (role === 'patient' && data.offer && !offerHandled) {
+              console.log('🤝 [WebRTC - Patient] Offer received, setting remote description...');
               offerHandled = true;
-              setStatus('connecting'); // Ensure we switch from waiting to connecting immediately
+              setStatus('connecting');
               
               await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
               remoteDescriptionReady = true;
               await flushPendingCandidates(peer);
 
+              console.log('🤝 [WebRTC - Patient] Creating answer...');
               const answer = await peer.createAnswer();
               await peer.setLocalDescription(answer);
 
@@ -315,9 +328,11 @@ export default function VideoCall({
                 },
                 { merge: true }
               );
+              console.log('✅ [WebRTC - Patient] Answer saved to Firebase');
             }
 
             if (role === 'doctor' && data.answer && !answerHandled) {
+              console.log('🤝 [WebRTC - Doctor] Answer received, finalizing connection...');
               answerHandled = true;
               setStatus('connecting');
               
@@ -326,13 +341,14 @@ export default function VideoCall({
               await flushPendingCandidates(peer);
             }
           } catch (err) {
-            console.error('[WebRTC] Room negotiation failed:', err);
+            console.error('❌ [WebRTC] Room negotiation failed:', err);
             setStatus('error');
             setError('Unable to negotiate the video connection.');
           }
         });
 
         if (role === 'doctor') {
+          console.log('🚀 [WebRTC - Doctor] Initiating room and offer...');
           await setDoc(roomRef, {
             roomId,
             appointmentId,
@@ -343,7 +359,7 @@ export default function VideoCall({
           }, { merge: true });
 
           const offer = await peer.createOffer();
-          await peer.setLocalDescription(offer);
+          await peer.setLocalDescription(offer); // This triggers onicecandidate!
 
           await setDoc(roomRef, {
             offer: { type: peer.localDescription?.type, sdp: peer.localDescription?.sdp },
@@ -352,10 +368,10 @@ export default function VideoCall({
             status: 'waiting',
             updatedAt: Timestamp.now(),
           }, { merge: true });
-
+          
+          console.log('✅ [WebRTC - Doctor] Offer saved to Firebase');
           setStatus('waiting');
         } else {
-          // Patient initialization safety catch
           if (!offerHandled) setStatus('waiting');
         }
       } catch (err) {
@@ -517,15 +533,6 @@ export default function VideoCall({
           playsInline
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${status === 'connected' ? 'opacity-100' : 'opacity-0'}`}
         />
-
-        {playbackBlocked && (
-          <button
-            onClick={playRemoteVideo}
-            className="absolute z-50 bg-teal-600/90 backdrop-blur-md px-6 py-3 rounded-full font-semibold shadow-2xl hover:bg-teal-500 transition border border-teal-400/30"
-          >
-            Tap to play video
-          </button>
-        )}
 
         {/* Loading / Waiting States */}
         {status !== 'connected' && (
